@@ -9,7 +9,7 @@ import numpy as np
 st.set_page_config(page_title="context-search")
 
 model_name = st.text_area(
-    "Enter the name of the pre-trained model from sentence transformers that we are using for summarization", value="paraphrase-MiniLM-L3-v2")
+    "Enter the name of the pre-trained model from sentence transformers that we are using for summarization", value="sentence-transformers/msmarco-distilbert-dot-v5")
 st.caption("This will download a new model, so it may take awhile or even break if the model is too large")
 st.caption("See the list of pre-trained models that are available here! https://www.sbert.net/docs/pretrained_models.html")
 
@@ -19,7 +19,7 @@ granularity = st.radio(
 query = st.text_area('Enter a query')
 corpus = st.text_area('Enter a document')
 percentage = st.number_input(
-    "Enter the percentage of the text you want highlighted", max_value=1, min_value=0, value=0.3)
+    "Enter the percentage of the text you want highlighted", max_value=1.0, min_value=0.0, value=0.3)
 window_sizes = [int(x) for x in st.text_area(
     'Enter a list of window sizes that seperated by space').split(" ")]
 
@@ -32,6 +32,7 @@ windowed_granularized_corpus = {}  # {window_size: [("",...), ...]}
 # {window_size: [({"corpus": "", "index": 0}, ...), ...]}
 windowed_granularized_corpus_indexed = {}
 semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
+final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
 if granularity == "sentence":
     doc = nlp(corpus)
@@ -68,8 +69,6 @@ for window_size in window_sizes:
     semantic_search_result[window_size] = util.semantic_search(
         query_embedding, corpus_embeddings, top_k=corpus_len)
 
-final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
-for window_size in window_sizes:
     for ssr in semantic_search_result[window_size][0]:
         for ssrw in windowed_granularized_corpus_indexed[window_size][ssr["corpus_id"]]:
             source_corpus_index = ssrw["index"]
@@ -85,6 +84,7 @@ for window_size in window_sizes:
                     ((ssr["score"]-old_score_mean)/new_count)
                 final_semantic_search_result[source_corpus_index]["score_mean"] = new_score_mean
 
+
 print_corpus = granularized_corpus[:]
 cleaned_raw_result = []
 top_k = int(np.ceil(len(print_corpus)*percentage))
@@ -99,7 +99,7 @@ for key, val in sorted(final_semantic_search_result.items(), key=lambda x: x[1][
     total_score_mean = new_score_mean
 
     cleaned_raw_result.append(
-        {"corpus_id": key, "score_mean": total_score_mean, "score": total_score})
+        {"corpus_id": key, "score_mean": val["score_mean"]})
 
     annotated = "\u0332".join(print_corpus[key])
     print_corpus[key] = annotated
@@ -115,7 +115,7 @@ st.subheader("Output summary")
 st.write(" ".join(print_corpus))
 
 st.subheader("Raw semantic search results")
-st.caption("corpus_id is the number of the word, sentence, or paragraph. Score is the raw cosine similarty score between the document and the query")
+st.caption("corpus_id is the index of the word, sentence, or paragraph. Score is the raw cosine similarty score between the document and the query")
 st.write(cleaned_raw_result)
 
 st.subheader("Results of granularized corpus (segmentation/tokenization)")
