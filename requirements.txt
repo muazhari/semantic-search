@@ -1,0 +1,3 @@
+streamlit
+sentence_transformers
+spacy
