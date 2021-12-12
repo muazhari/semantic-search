@@ -107,12 +107,9 @@ for key, val in sorted(final_semantic_search_result.items(), key=lambda x: x[1][
     annotated = "\u0332".join(print_corpus[key])
     print_corpus[key] = annotated
 
-print([total_score_mean, total_count])
-" ".join(print_corpus)
-
 
 st.subheader("Total score mean")
-st.write(" ".join(total_score_mean))
+st.write(total_score_mean)
 
 st.subheader("Output summary")
 st.write(" ".join(print_corpus))
