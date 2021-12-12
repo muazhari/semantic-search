@@ -1,4 +1,5 @@
 from re import split
+import re
 import streamlit as st
 import more_itertools
 import spacy
@@ -20,8 +21,10 @@ query = st.text_area('Enter a query')
 corpus = st.text_area('Enter a document')
 percentage = st.number_input(
     "Enter the percentage of the text you want highlighted", max_value=1.0, min_value=0.0, value=0.3)
-window_sizes = [int(x) for x in st.text_area(
-    'Enter a list of window sizes that seperated by space').split(" ")]
+window_sizes = st.text_area(
+    'Enter a list of window sizes that seperated by a space')
+window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
+
 
 nlp = spacy.load('en_core_web_sm')
 
@@ -115,7 +118,7 @@ st.subheader("Output summary")
 st.write(" ".join(print_corpus))
 
 st.subheader("Raw semantic search results")
-st.caption("corpus_id is the index of the word, sentence, or paragraph. Score is the raw cosine similarty score between the document and the query")
+st.caption("corpus_id is the index of the word, sentence, or paragraph. score_mean is mean of all window size scores by raw cosine similarty between the query and the document")
 st.write(cleaned_raw_result)
 
 st.subheader("Results of granularized corpus (segmentation/tokenization)")
