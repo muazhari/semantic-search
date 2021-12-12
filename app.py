@@ -5,6 +5,9 @@ import spacy
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
 
+
+st.set_page_config(page_title="context-search")
+
 model_name = st.text_area(
     "Enter the name of the pre-trained model from sentence transformers that we are using for summarization", value="paraphrase-MiniLM-L3-v2")
 st.caption("This will download a new model, so it may take awhile or even break if the model is too large")

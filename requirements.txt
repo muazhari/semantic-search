@@ -1,3 +1,4 @@
 streamlit
 sentence_transformers
 spacy
+more_itertools
