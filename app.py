@@ -167,7 +167,7 @@ filtered_search_result = get_filtered_search_result(percentage)
 t1 = time.time()
 
 st.subheader("Output process duration")
-st.write("{} ms".format(t1-t0))
+st.write("{} s".format(t1-t0))
 
 st.subheader("Output score mean")
 st.write(filtered_search_result["score_mean"])
