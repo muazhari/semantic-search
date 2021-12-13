@@ -48,9 +48,9 @@ window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 @st.cache
 def get_granularized_corpus(corpus, granularity, window_sizes):
     granularized_corpus = []  # ["", ...]
-    granularized_corpus["windowed"] = {}  # {window_size: [("",...), ...]}
+    granularized_corpus_windowed = {}  # {window_size: [("",...), ...]}
     # {window_size: [({"corpus": "", "index": 0}, ...), ...]}
-    granularized_corpus["windowed_indexed"] = {}
+    granularized_corpus_windowed_indexed = {}
 
     if granularity == "sentence":
         doc = nlp(corpus)
@@ -62,20 +62,20 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
         granularized_corpus = corpus.splitlines()
 
     for window_size in window_sizes:
-        granularized_corpus["windowed"][window_size] = []
-        granularized_corpus["windowed_indexed"][window_size] = []
+        granularized_corpus_windowed[window_size] = []
+        granularized_corpus_windowed_indexed[window_size] = []
         for wgc in more_itertools.windowed(enumerate(granularized_corpus), window_size):
             item_without_index = []
             item_with_index = []
             for item in wgc:
                 item_without_index.append(item[1])
                 item_with_index.append({"index": item[0], "corpus": item[1]})
-            granularized_corpus["windowed"][window_size].append(
+            granularized_corpus_windowed[window_size].append(
                 item_without_index)
-            granularized_corpus["windowed_indexed"][window_size].append(
+            granularized_corpus_windowed_indexed[window_size].append(
                 item_with_index)
 
-    return {"raw": granularized_corpus, "windowed": granularized_corpus["windowed"], "windowed_indexed": granularized_corpus["windowed_indexed"]}
+    return {"raw": granularized_corpus, "windowed": granularized_corpus_windowed, "windowed_indexed": granularized_corpus_windowed_indexed}
 
 
 granularized_corpus = get_granularized_corpus(
