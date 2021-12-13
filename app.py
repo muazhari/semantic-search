@@ -169,10 +169,10 @@ t1 = time.time()
 st.subheader("Output process duration")
 st.write("{} ms".format(t1-t0))
 
-st.subheader("Output total score mean")
+st.subheader("Output score mean")
 st.write(filtered_search_result["score_mean"])
 
-st.subheader("Output summary")
+st.subheader("Output content")
 st.write(" ".join(filtered_search_result["print_corpus"]))
 
 st.subheader("Raw semantic search results")
