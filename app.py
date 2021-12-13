@@ -155,7 +155,7 @@ def get_filtered_search_result(percentage):
         total_score_mean = new_score_mean
 
         cleaned_raw_result.append(
-            {"corpus_id": key, "score": val["score"]})
+            {"corpus_id": key, "score": val["score_mean"]})
 
         annotated = "\u0332".join(print_corpus[key])
         print_corpus[key] = annotated
