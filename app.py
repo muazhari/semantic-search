@@ -1,3 +1,4 @@
+import torch
 import re
 import streamlit as st
 import more_itertools
@@ -5,6 +6,7 @@ import spacy
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
 import time
+import io
 
 t0 = time.time()
 
@@ -83,7 +85,7 @@ granularized_corpus = get_granularized_corpus(
     corpus, granularity, window_sizes)
 
 
-@st.cache
+@st.cache(hash_funcs={spacy.vocab.Vocab: lambda x: None})
 def search(query, window_sizes):
     global granularized_corpus
 
