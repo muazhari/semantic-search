@@ -34,8 +34,6 @@ def get_model(model_name):
 
 model = get_model(model_name)
 
-query = st.text_area('Enter a query')
-
 
 @st.cache(hash_funcs={torch.Tensor: lambda x: None})
 def get_embedding(data):
@@ -45,9 +43,10 @@ def get_embedding(data):
     return query_embedding
 
 
+corpus = st.text_area('Enter a document')
 granularity = st.radio(
     "What level of granularity do you want to summarize at?", ('sentence', 'word', 'paragraph'))
-corpus = st.text_area('Enter a document')
+query = st.text_area('Enter a query')
 window_sizes = st.text_area(
     'Enter a list of window sizes that seperated by a space')
 window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
