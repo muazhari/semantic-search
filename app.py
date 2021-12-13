@@ -20,6 +20,12 @@ st.caption("This will download a new model, so it may take awhile or even break 
 st.caption("See the list of pre-trained models that are available here! https://www.sbert.net/docs/pretrained_models.html")
 
 
+def hash_tensor(x):
+    bio = io.BytesIO()
+    torch.save(x, bio)
+    return bio.getvalue()
+
+
 @st.cache
 def get_model(model_name):
     model = SentenceTransformer(model_name, device='cuda')
@@ -31,7 +37,7 @@ model = get_model(model_name)
 query = st.text_area('Enter a query')
 
 
-@st.cache
+@st.cache(hash_funcs={torch.Tensor: lambda x: None})
 def get_embedding(data):
     global model
     query_embedding = model.encode(
