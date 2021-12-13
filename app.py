@@ -1,4 +1,3 @@
-from re import split
 import re
 import streamlit as st
 import more_itertools
@@ -8,11 +7,6 @@ import numpy as np
 import time
 
 st.set_page_config(page_title="context-search")
-
-
-window_sizes = st.text_area(
-    'Enter a list of window sizes that seperated by a space')
-window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 
 
 nlp = spacy.load('en_core_web_sm')
