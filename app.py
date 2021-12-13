@@ -102,30 +102,30 @@ def search(query, window_sizes):
 
     for window_size in window_sizes:
         corpus_len = len(granularized_corpus["windowed"][window_size])
-    if(window_size == 1):
-        granularized_corpus["windowed"][window_size] = [x[0]
-                                                        for x in granularized_corpus["windowed"][window_size]]
-    corpus_embeddings = get_embedding(
-        granularized_corpus["windowed"][window_size])
+        if(window_size == 1):
+            granularized_corpus["windowed"][window_size] = [x[0]
+                                                            for x in granularized_corpus["windowed"][window_size]]
+        corpus_embeddings = get_embedding(
+            granularized_corpus["windowed"][window_size])
 
-    semantic_search_result[window_size] = util.semantic_search(
-        query_embedding, corpus_embeddings, top_k=corpus_len, score_function=util.dot_score)
+        semantic_search_result[window_size] = util.semantic_search(
+            query_embedding, corpus_embeddings, top_k=corpus_len, score_function=util.dot_score)
 
-    # averaging overlapping result
-    for ssr in semantic_search_result[window_size][0]:
-        for ssrw in granularized_corpus["windowed_indexed"][window_size][ssr["corpus_id"]]:
-            source_corpus_index = ssrw["index"]
-            if(final_semantic_search_result.get(source_corpus_index, None) is None):
-                final_semantic_search_result[source_corpus_index] = {
-                    "count": 1, "score_mean": ssr["score"]}
-            else:
-                old_count = final_semantic_search_result[source_corpus_index]["count"]
-                new_count = old_count + 1
-                final_semantic_search_result[source_corpus_index]["count"] = new_count
-                old_score_mean = final_semantic_search_result[source_corpus_index]["score_mean"]
-                new_score_mean = old_score_mean + \
-                    ((ssr["score"]-old_score_mean)/new_count)
-                final_semantic_search_result[source_corpus_index]["score_mean"] = new_score_mean
+        # averaging overlapping result
+        for ssr in semantic_search_result[window_size][0]:
+            for ssrw in granularized_corpus["windowed_indexed"][window_size][ssr["corpus_id"]]:
+                source_corpus_index = ssrw["index"]
+                if(final_semantic_search_result.get(source_corpus_index, None) is None):
+                    final_semantic_search_result[source_corpus_index] = {
+                        "count": 1, "score_mean": ssr["score"]}
+                else:
+                    old_count = final_semantic_search_result[source_corpus_index]["count"]
+                    new_count = old_count + 1
+                    final_semantic_search_result[source_corpus_index]["count"] = new_count
+                    old_score_mean = final_semantic_search_result[source_corpus_index]["score_mean"]
+                    new_score_mean = old_score_mean + \
+                        ((ssr["score"]-old_score_mean)/new_count)
+                    final_semantic_search_result[source_corpus_index]["score_mean"] = new_score_mean
 
     return {"raw": semantic_search_result, "final": final_semantic_search_result}
 
