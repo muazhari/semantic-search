@@ -143,16 +143,16 @@ def get_filtered_search_result(percentage):
     print_corpus = granularized_corpus["raw"][:]
     cleaned_raw_result = []
     top_k = int(np.ceil(len(print_corpus)*percentage))
-    total_score_mean = total_count = 0
+    score_mean = total_count = 0
     for key, val in sorted(search_result["final"].items(), key=lambda x: x[1]["score_mean"], reverse=True)[:top_k]:
         old_count = total_count
         new_count = old_count + 1
         total_count = new_count
         total_score = val["score_mean"]
-        old_score_mean = total_score_mean
+        old_score_mean = score_mean
         new_score_mean = old_score_mean + \
             ((total_score-old_score_mean)/new_count)
-        total_score_mean = new_score_mean
+        score_mean = new_score_mean
 
         cleaned_raw_result.append(
             {"corpus_id": key, "score": val["score_mean"]})
@@ -160,7 +160,7 @@ def get_filtered_search_result(percentage):
         annotated = "\u0332".join(print_corpus[key])
         print_corpus[key] = annotated
 
-    return {"print_corpus": print_corpus, "cleaned_raw": cleaned_raw_result, total_score_mean: "score_mean"}
+    return {"print_corpus": print_corpus, "cleaned_raw": cleaned_raw_result, "score_mean": score_mean}
 
 
 filtered_search_result = get_filtered_search_result(percentage)
