@@ -85,7 +85,7 @@ granularized_corpus = get_granularized_corpus(
     corpus, granularity, window_sizes)
 
 
-@st.cache(hash_funcs={spacy.vocab.Vocab: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: lambda x: None})
 def search(query, window_sizes):
     global granularized_corpus
 
