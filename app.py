@@ -108,7 +108,7 @@ for key, val in sorted(final_semantic_search_result.items(), key=lambda x: x[1][
 t1 = time.time()
 
 st.subheader("Output process duration")
-st.write("{} ms" % (t1-t0))
+st.write("{} ms".format(t1-t0))
 
 st.subheader("Output total score mean")
 st.write(total_score_mean)
