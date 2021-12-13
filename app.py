@@ -47,6 +47,8 @@ window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 
 @st.cache
 def get_granularized_corpus(corpus, granularity, window_sizes):
+    global nlp
+    
     granularized_corpus = []  # ["", ...]
     granularized_corpus_windowed = {}  # {window_size: [("",...), ...]}
     # {window_size: [({"corpus": "", "index": 0}, ...), ...]}
@@ -56,7 +58,6 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
         doc = nlp(corpus)
         granularized_corpus = [str(sent) for sent in doc.sents]
     elif granularity == "word":
-        doc = nlp(corpus)
         granularized_corpus += corpus.split()
     elif granularity == "paragraph":
         granularized_corpus = corpus.splitlines()
