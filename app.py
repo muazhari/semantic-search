@@ -137,7 +137,7 @@ percentage = st.number_input(
 
 @st.cache
 def get_filtered_search_result(percentage):
-    global granularized_corpus, search_result
+    global granularized_corpus, search_result, granularity
 
     print_corpus = granularized_corpus["raw"][:]
     cleaned_raw_result = []
@@ -159,8 +159,15 @@ def get_filtered_search_result(percentage):
         # annotated = "\u0332".join(print_corpus[key])
         # annotated = "<font color='red'>{}</font>".format(print_corpus[key].splitlines())
         annotated = "<mark style='background-color: lightgreen; color: black'>{}</mark>".format(
-            '<br />'.join(print_corpus[key].splitlines()))
+            print_corpus[key])
         print_corpus[key] = annotated
+
+    if(granularity == 'sentence' | granularity == 'word'):
+        print_corpus[key] = " ".join(print_corpus[key])
+    elif(granularity == 'paragraph'):
+        print_corpus[key] = "\n".join(print_corpus[key])
+
+    print_corpus = '<br />'.join(print_corpus[key].splitlines())
 
     return {"print_corpus": print_corpus, "cleaned_raw": cleaned_raw_result, "score_mean": score_mean}
 
@@ -176,8 +183,7 @@ st.subheader("Output score mean")
 st.write(filtered_search_result["score_mean"])
 
 st.subheader("Output content")
-st.write(
-    " ".join(filtered_search_result["print_corpus"]), unsafe_allow_html=True)
+st.write(filtered_search_result["print_corpus"], unsafe_allow_html=True)
 
 st.subheader("Raw semantic search results")
 st.caption("corpus_id is the index of the word, sentence, or paragraph. score_mean is mean of all window size scores by raw cosine similarty between the query and the document")
