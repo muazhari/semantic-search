@@ -157,7 +157,8 @@ def get_filtered_search_result(percentage):
             {"corpus_id": key, "score": val["score_mean"]})
 
         # annotated = "\u0332".join(print_corpus[key])
-        annotated = "<font color='red'>{}</font>".format(print_corpus[key])
+        # annotated = "<font color='red'>{}</font>".format(print_corpus[key])
+        annotated = "<mark>{}</mark>".format(print_corpus[key])
         print_corpus[key] = annotated
 
     return {"print_corpus": print_corpus, "cleaned_raw": cleaned_raw_result, "score_mean": score_mean}
