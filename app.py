@@ -158,8 +158,7 @@ def get_filtered_search_result(percentage):
 
         # annotated = "\u0332".join(print_corpus[key])
         # annotated = "<font color='red'>{}</font>".format(print_corpus[key])
-        # annotated = "<mark>{}</mark>".format(print_corpus[key])
-        annotated = "<span style='background-color: yellow; color: black'>{}</span>".format(
+        annotated = "<mark style='background-color: lightgreen; color: black'>{}</mark>".format(
             print_corpus[key])
         print_corpus[key] = annotated
 
