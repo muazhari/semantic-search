@@ -162,12 +162,12 @@ def get_filtered_search_result(percentage):
             print_corpus[key])
         print_corpus[key] = annotated
 
-    if(granularity == 'sentence' or granularity == 'word'):
-        print_corpus[key] = " ".join(print_corpus[key])
-    elif(granularity == 'paragraph'):
-        print_corpus[key] = "\n".join(print_corpus[key])
+        if(granularity == 'sentence' or granularity == 'word'):
+            print_corpus[key] = " ".join(print_corpus[key])
+        elif(granularity == 'paragraph'):
+            print_corpus[key] = "\n".join(print_corpus[key])
 
-    print_corpus = '<br />'.join(print_corpus[key].splitlines())
+    print_corpus = '<br />'.join(print_corpus.splitlines())
 
     return {"print_corpus": print_corpus, "cleaned_raw": cleaned_raw_result, "score_mean": score_mean}
 
