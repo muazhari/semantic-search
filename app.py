@@ -156,7 +156,8 @@ def get_filtered_search_result(percentage):
         cleaned_raw_result.append(
             {"corpus_id": key, "score": val["score_mean"]})
 
-        annotated = "\u0332".join(print_corpus[key])
+        # annotated = "\u0332".join(print_corpus[key])
+        annotated = "<font color='red'>{}</font>".format(print_corpus[key])
         print_corpus[key] = annotated
 
     return {"print_corpus": print_corpus, "cleaned_raw": cleaned_raw_result, "score_mean": score_mean}
@@ -173,7 +174,8 @@ st.subheader("Output score mean")
 st.write(filtered_search_result["score_mean"])
 
 st.subheader("Output content")
-st.write(" ".join(filtered_search_result["print_corpus"]))
+st.write(
+    " ".join(filtered_search_result["print_corpus"]), unsafe_allow_html=True)
 
 st.subheader("Raw semantic search results")
 st.caption("corpus_id is the index of the word, sentence, or paragraph. score_mean is mean of all window size scores by raw cosine similarty between the query and the document")
