@@ -26,18 +26,22 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
+@st.cache(allow_output_mutation=True)
 def get_model(model_name):
     model = SentenceTransformer(model_name, device='cuda')
     return model
 
 
-model = get_model(model_name)
+@st.cache(hash_funcs={torch.Tensor: hash_tensor})
+def get_query_embedding(model_name, data):
+    query_embedding = get_model(model_name).encode(
+        data, convert_to_tensor=True).to('cuda')
+    return query_embedding
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor})
-def get_embedding(data):
-    global model
-    query_embedding = model.encode(
+def get_corpus_embedding(model_name, data):
+    query_embedding = get_model(model_name).encode(
         data, convert_to_tensor=True).to('cuda')
     return query_embedding
 
@@ -91,20 +95,20 @@ granularized_corpus = get_granularized_corpus(
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor})
 def search(query, window_sizes):
-    global granularized_corpus
+    global granularized_corpus, model_name
 
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
-    query_embedding = get_embedding([query])
+    query_embedding = get_query_embedding(model_name, [query])
 
     for window_size in window_sizes:
         corpus_len = len(granularized_corpus["windowed"][window_size])
         if(window_size == 1):
             granularized_corpus["windowed"][window_size] = [x[0]
                                                             for x in granularized_corpus["windowed"][window_size]]
-        corpus_embeddings = get_embedding(
-            granularized_corpus["windowed"][window_size])
+        corpus_embeddings = get_corpus_embedding(model_name,
+                                                 granularized_corpus["windowed"][window_size])
 
         semantic_search_result[window_size] = util.semantic_search(
             query_embedding, corpus_embeddings, top_k=corpus_len, score_function=util.dot_score)
