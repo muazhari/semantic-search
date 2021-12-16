@@ -35,7 +35,7 @@ def get_model(model_name):
 model = get_model(model_name)
 
 
-@st.cache(hash_funcs={torch.Tensor: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor})
 def get_embedding(data):
     global model
     query_embedding = model.encode(
@@ -90,7 +90,7 @@ granularized_corpus = get_granularized_corpus(
     corpus, granularity, window_sizes)
 
 
-@st.cache(hash_funcs={torch.Tensor: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor})
 def search(query, window_sizes):
     global granularized_corpus
 
