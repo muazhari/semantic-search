@@ -20,6 +20,10 @@ st.caption("This will download a new model, so it may take awhile or even break 
 st.caption("See the list of pre-trained models that are available here! https://www.sbert.net/docs/pretrained_models.html")
 
 
+scoring_technique = st.radio(
+    "Enter the scoring technique based on suitable score function in pre-trained model from sentence transformers that we are using for summarization", ("cos_sim", "dot_product"))
+
+
 def hash_tensor(x):
     bio = io.BytesIO()
     torch.save(x, bio)
@@ -33,15 +37,9 @@ def get_model(model_name):
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor})
-def get_query_embedding(model_name, data):
-    query_embedding = get_model(model_name).encode(
-        data, convert_to_tensor=True).to('cuda')
-    return query_embedding
-
-
-@st.cache(hash_funcs={torch.Tensor: hash_tensor})
-def get_corpus_embedding(model_name, data):
-    query_embedding = get_model(model_name).encode(
+def get_embedding(model_name, data):
+    model = get_model(model_name)
+    query_embedding = model.encode(
         data, convert_to_tensor=True).to('cuda')
     return query_embedding
 
@@ -51,7 +49,7 @@ granularity = st.radio(
     "What level of granularity do you want to summarize at?", ('sentence', 'word', 'paragraph'))
 query = st.text_area('Enter a query')
 window_sizes = st.text_area(
-    'Enter a list of window sizes that seperated by a space', value="1 3")
+    'Enter a list of window sizes that seperated by a space')
 window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 
 
@@ -94,27 +92,28 @@ granularized_corpus = get_granularized_corpus(
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor})
-def search(query, window_sizes):
-    global granularized_corpus, model_name
+def search(model_name, scoring_technique, query, window_sizes):
+    global granularized_corpus
 
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
-    query_embedding = get_query_embedding(model_name, [query])
-    query_embedding = util.normalize_embeddings(query_embedding)
+    query_embedding = get_embedding(model_name, [query])
 
     for window_size in window_sizes:
         corpus_len = len(granularized_corpus["windowed"][window_size])
         if(window_size == 1):
             granularized_corpus["windowed"][window_size] = [x[0]
                                                             for x in granularized_corpus["windowed"][window_size]]
-        corpus_embeddings = get_corpus_embedding(model_name,
-                                                 granularized_corpus["windowed"][window_size])
+        corpus_embeddings = get_embedding(
+            model_name, granularized_corpus["windowed"][window_size])
 
-        corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
+        score_function = util.cos_sim
+        if(scoring_technique == "dot_product"):
+            score_function = util.dot_product
 
         semantic_search_result[window_size] = util.semantic_search(
-            query_embedding, corpus_embeddings, top_k=corpus_len, score_function=util.dot_score)
+            query_embedding, corpus_embeddings, top_k=corpus_len, score_function=score_function)
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size][0]:
@@ -136,7 +135,7 @@ def search(query, window_sizes):
     return {"raw": semantic_search_result, "final": final_semantic_search_result}
 
 
-search_result = search(query, window_sizes)
+search_result = search(model_name, scoring_technique, query, window_sizes)
 
 percentage = st.number_input(
     "Enter the percentage of the text you want highlighted", max_value=1.0, min_value=0.0, value=0.3)
