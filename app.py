@@ -111,7 +111,7 @@ def search(query, window_sizes):
                                                  granularized_corpus["windowed"][window_size])
 
         semantic_search_result[window_size] = util.semantic_search(
-            query_embedding, corpus_embeddings, top_k=corpus_len, score_function=util.dot_score)
+            query_embedding, corpus_embeddings, top_k=corpus_len)
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size][0]:
