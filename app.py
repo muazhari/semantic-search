@@ -26,7 +26,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache(ignore_hash=True)
 def get_model(model_name):
     model = SentenceTransformer(model_name, device='cuda')
     return model
