@@ -15,13 +15,13 @@ st.set_page_config(page_title="context-search")
 nlp = spacy.load('en_core_web_sm')
 
 model_name = st.text_area(
-    "Enter the name of the pre-trained model from sentence transformers that we are using for summarization", value="sentence-transformers/msmarco-distilbert-dot-v5")
-st.caption("This will download a new model, so it may take awhile or even break if the model is too large")
-st.caption("See the list of pre-trained models that are available here! https://www.sbert.net/docs/pretrained_models.html")
+    "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.", value="sentence-transformers/msmarco-distilbert-dot-v5")
+st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
+st.caption("See the list of pre-trained models that are available here! https://www.sbert.net/docs/pretrained_models.html.")
 
 
 scoring_technique = st.radio(
-    "Enter the scoring technique based on suitable score function in pre-trained model from sentence transformers that we are using for summarization", ("cosine-similarity", "dot-product"))
+    "Enter the scoring technique based on suitable score function in selected pre-trained model from sentence transformers.", ("cosine-similarity", "dot-product"))
 
 
 def hash_tensor(x):
@@ -44,12 +44,12 @@ def get_embedding(model_name, data):
     return query_embedding
 
 
-corpus = st.text_area('Enter a document')
+corpus = st.text_area('Enter a document.')
 granularity = st.radio(
     "What level of granularity do you want to summarize at?", ('sentence', 'word', 'paragraph'))
-query = st.text_area('Enter a query')
+query = st.text_area('Enter a query.')
 window_sizes = st.text_area(
-    'Enter a list of window sizes that seperated by a space')
+    'Enter a list of window sizes that seperated by a space.')
 window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 
 
@@ -138,7 +138,7 @@ def search(model_name, scoring_technique, query, window_sizes):
 search_result = search(model_name, scoring_technique, query, window_sizes)
 
 percentage = st.number_input(
-    "Enter the percentage of the text you want highlighted", max_value=1.0, min_value=0.0, value=0.3)
+    "Enter the percentage of the text you want highlighted.", max_value=1.0, min_value=0.0, value=0.3)
 
 
 @st.cache
