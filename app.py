@@ -65,7 +65,7 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
         doc = nlp(corpus)
         granularized_corpus = [str(sent) for sent in doc.sents]
     elif granularity == "word":
-        granularized_corpus += corpus.split()
+        granularized_corpus += corpus.split(" ")
     elif granularity == "paragraph":
         granularized_corpus = corpus.splitlines()
 
@@ -121,9 +121,10 @@ def search(query, window_sizes):
                     old_count = final_semantic_search_result[source_corpus_index]["count"]
                     new_count = old_count + 1
                     final_semantic_search_result[source_corpus_index]["count"] = new_count
+                    new_value = ssr["score"]
                     old_score_mean = final_semantic_search_result[source_corpus_index]["score_mean"]
                     new_score_mean = old_score_mean + \
-                        ((ssr["score"]-old_score_mean)/new_count)
+                        ((new_value-old_score_mean)/new_count)
                     final_semantic_search_result[source_corpus_index]["score_mean"] = new_score_mean
 
     return {"raw": semantic_search_result, "final": final_semantic_search_result}
@@ -147,10 +148,10 @@ def get_filtered_search_result(percentage):
         old_count = total_count
         new_count = old_count + 1
         total_count = new_count
-        total_score = val["score_mean"]
+        new_value = val["score_mean"]
         old_score_mean = score_mean
         new_score_mean = old_score_mean + \
-            ((total_score-old_score_mean)/new_count)
+            ((new_value-old_score_mean)/new_count)
         score_mean = new_score_mean
 
         cleaned_raw_result.append(
@@ -186,7 +187,7 @@ st.subheader("Output content")
 st.write(filtered_search_result["print_corpus"], unsafe_allow_html=True)
 
 st.subheader("Raw semantic search results")
-st.caption("corpus_id is the index of the word, sentence, or paragraph. score_mean is mean of all window size scores by raw cosine similarty between the query and the document")
+st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by dot-product similarity between the query and the document")
 st.write(filtered_search_result["cleaned_raw"])
 
 st.subheader("Results of granularized corpus (segmentation/tokenization)")
