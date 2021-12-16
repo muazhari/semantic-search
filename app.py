@@ -51,7 +51,7 @@ granularity = st.radio(
     "What level of granularity do you want to summarize at?", ('sentence', 'word', 'paragraph'))
 query = st.text_area('Enter a query')
 window_sizes = st.text_area(
-    'Enter a list of window sizes that seperated by a space')
+    'Enter a list of window sizes that seperated by a space', value="1 3")
 window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 
 
@@ -101,6 +101,7 @@ def search(query, window_sizes):
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     query_embedding = get_query_embedding(model_name, [query])
+    query_embedding = util.normalize_embeddings(query_embedding)
 
     for window_size in window_sizes:
         corpus_len = len(granularized_corpus["windowed"][window_size])
@@ -110,8 +111,10 @@ def search(query, window_sizes):
         corpus_embeddings = get_corpus_embedding(model_name,
                                                  granularized_corpus["windowed"][window_size])
 
+        corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
+
         semantic_search_result[window_size] = util.semantic_search(
-            query_embedding, corpus_embeddings, top_k=corpus_len)
+            query_embedding, corpus_embeddings, top_k=corpus_len, score_function=util.dot_score)
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size][0]:
