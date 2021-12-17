@@ -15,8 +15,8 @@ st.set_page_config(page_title="context-search")
 nlp = spacy.load('en_core_web_sm')
 
 model_name = st.text_area(
-    "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.", 
-    value="sentence-transformers/msmarco-distilbert-base-v4")
+    "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.",
+    value="sentence-transformers/msmarco-bert-base-dot-v5")
 st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
 st.caption("See the list of pre-trained models that are available here! https://www.sbert.net/docs/pretrained_models.html.")
 
