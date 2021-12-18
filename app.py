@@ -75,15 +75,20 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
         granularized_corpus_windowed[window_size] = []
         granularized_corpus_windowed_indexed[window_size] = []
         for wgc in more_itertools.windowed(enumerate(granularized_corpus), window_size):
-            item_without_index = []
-            item_with_index = []
-            for item in wgc:
-                item_without_index.append(item[1])
-                item_with_index.append({"index": item[0], "corpus": item[1]})
-            granularized_corpus_windowed[window_size].append(
-                item_without_index)
+            source_index = []
+            windowed_corpus = []
+            for index, item in wgc:
+                source_index.append(index)
+                windowed_corpus.append(item)
+
+            if(granularity == 'sentence' or granularity == 'word'):
+                windowed_corpus = " ".join(windowed_corpus)
+            elif(granularity == 'paragraph'):
+                windowed_corpus = "\n".join(windowed_corpus)
+
+            granularized_corpus_windowed[window_size].append(windowed_corpus)
             granularized_corpus_windowed_indexed[window_size].append(
-                item_with_index)
+                source_index)
 
     return {"raw": granularized_corpus, "windowed": granularized_corpus_windowed, "windowed_indexed": granularized_corpus_windowed_indexed}
 
@@ -103,9 +108,7 @@ def search(model_name, scoring_technique, query, window_sizes):
 
     for window_size in window_sizes:
         corpus_len = len(granularized_corpus["windowed"][window_size])
-        if(window_size == 1):
-            granularized_corpus["windowed"][window_size] = [x[0]
-                                                            for x in granularized_corpus["windowed"][window_size]]
+
         corpus_embeddings = get_embedding(
             model_name, granularized_corpus["windowed"][window_size])
 
