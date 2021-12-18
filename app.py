@@ -195,7 +195,7 @@ st.subheader("Output content")
 st.write(filtered_search_result["print_corpus"], unsafe_allow_html=True)
 
 st.subheader("Raw semantic search results")
-st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by dot-product similarity between the query and the document")
+st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the document")
 st.write(filtered_search_result["cleaned_raw"])
 
 st.subheader("Results of granularized corpus (segmentation/tokenization)")
