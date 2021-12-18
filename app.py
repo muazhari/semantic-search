@@ -151,7 +151,8 @@ def get_filtered_search_result(percentage):
     print_corpus = granularized_corpus["raw"][:]
     cleaned_raw_result = []
     top_k = int(np.ceil(len(print_corpus)*percentage))
-    score_mean = total_count = 0
+    score_mean = 0
+    total_count = 0
     for key, val in sorted(search_result["final"].items(), key=lambda x: x[1]["score_mean"], reverse=True)[:top_k]:
         old_count = total_count
         new_count = old_count + 1
