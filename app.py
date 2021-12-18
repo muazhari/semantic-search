@@ -22,7 +22,7 @@ st.caption("See the list of pre-trained models that are available here! https://
 
 
 scoring_technique = st.radio(
-    "Enter the scoring technique based on suitable score function in selected pre-trained model from sentence transformers.", ("cosine-similarity", "dot-product"))
+    "Enter the scoring technique based on suitable score function in selected pre-trained model from sentence transformers.", ("cos_sim", "dot_product", 'pairwise_cos_sim', 'pairwise_dot_product'))
 
 
 def hash_tensor(x):
@@ -114,9 +114,14 @@ def search(model_name, scoring_technique, query, window_sizes):
         corpus_embeddings = get_embedding(
             model_name, granularized_corpus["windowed"][window_size])
 
-        score_function = util.cos_sim
-        if(scoring_technique == "dot-product"):
+        if(scoring_technique == "dot_product"):
             score_function = util.dot_score
+        elif (scoring_technique == "pairwise_dot_product"):
+            score_function = util.pairwise_dot_score
+        elif (scoring_technique == "pairwise_cos_sim"):
+            score_function = util.pairwise_cos_sim
+        else:
+            score_function = util.cos_sim
 
         semantic_search_result[window_size] = util.semantic_search(
             query_embedding, corpus_embeddings, top_k=corpus_len, score_function=score_function)
