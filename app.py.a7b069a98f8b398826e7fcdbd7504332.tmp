@@ -145,8 +145,6 @@ def search(model_name, scoring_technique, query, window_sizes):
 
 search_result = search(model_name, scoring_technique, query, window_sizes)
 
-st.write(search_result)
-
 percentage = st.number_input(
     "Enter the percentage of the text you want highlighted.", max_value=1.0, min_value=0.0, value=0.3)
 
