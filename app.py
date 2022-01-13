@@ -22,7 +22,7 @@ st.caption("See the list of pre-trained models that are available here! https://
 
 
 scoring_technique = st.radio(
-    "Enter the scoring technique based on suitable score function in selected pre-trained model from sentence transformers.", ("cos_sim", "dot_product", 'pairwise_cos_sim', 'pairwise_dot_product'))
+    "Enter the scoring technique based on suitable score function in selected pre-trained model from sentence transformers.", ("cos_sim", "dot_product", 'pairwise_cos_sim', 'pairwise_dot_product'), index=1)
 
 
 def hash_tensor(x):
