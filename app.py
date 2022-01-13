@@ -175,7 +175,7 @@ def get_filtered_search_result(percentage):
 
         # annotated = "\u0332".join(print_corpus[key])
         # annotated = "<font color='red'>{}</font>".format(print_corpus[key].splitlines())
-        annotated = "<mark style='background-color: lightgreen; color: black'>{}</mark>".format(
+        annotated = "<mark style='background-color: lightgreen'>{}</mark>".format(
             print_corpus[key])
         print_corpus[key] = annotated
 
@@ -197,6 +197,8 @@ st.subheader("Output process duration")
 st.write("{} s".format(t1-t0))
 
 st.subheader("Output score mean")
+st.caption(
+    "Metric to determine how sure the context of query is in the highlighted document")
 st.write(filtered_search_result["score_mean"])
 
 st.subheader("Output content")
