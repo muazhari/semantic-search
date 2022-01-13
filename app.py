@@ -47,7 +47,7 @@ def get_embedding(model_name, data):
 
 corpus = st.text_area('Enter a document.')
 granularity = st.radio(
-    "What level of granularity do you want to summarize at?", ('sentence', 'word', 'paragraph'))
+    "What level of granularity do you want to search at?", ('sentence', 'word', 'paragraph'))
 query = st.text_area('Enter a query.')
 window_sizes = st.text_area(
     'Enter a list of window sizes that seperated by a space.')
