@@ -222,7 +222,7 @@ st.caption(
 st.write("Raw: {}".format(filtered_search_result["score_mean"]))
 st.write("Minimum: {}".format(filtered_search_result_minimum["score_mean"]))
 st.write("Maximum: {}".format(filtered_search_result_maximum["score_mean"]))
-st.write("Percentage: {}".format(
+st.write("Percentage: {}%".format(
     filtered_search_result_minimum["score_mean"]/filtered_search_result_maximum["score_mean"]*100))
 
 st.subheader("Output content")
