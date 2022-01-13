@@ -16,7 +16,7 @@ nlp = spacy.load('en_core_web_sm')
 
 model_name = st.text_area(
     "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.",
-    value="sentence-transformers/msmarco-distilbert-cos-v5")
+    value="sentence-transformers/msmarco-bert-base-dot-v5")
 st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
 st.caption("See the list of pre-trained models that are available here! https://www.sbert.net/docs/pretrained_models.html.")
 
@@ -55,9 +55,7 @@ window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 
 
 @st.cache(hash_funcs={spacy.vocab.Vocab: lambda x: None})
-def get_granularized_corpus(corpus, granularity, window_sizes):
-    global nlp
-
+def get_granularized_corpus(corpus, granularity, window_sizes, nlp):
     granularized_corpus = []  # ["", ...]
     granularized_corpus_windowed = {}  # {window_size: [("",...), ...]}
     # {window_size: [({"corpus": "", "index": 0}, ...), ...]}
@@ -94,15 +92,26 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
 
 
 granularized_corpus = get_granularized_corpus(
-    corpus, granularity, window_sizes)
+    corpus, granularity, window_sizes, nlp)
 
 query_embedding = get_embedding(model_name, [query])
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor})
-def search(model_name, scoring_technique, query, window_sizes):
-    global granularized_corpus
+@st.cache
+def set_scoring_technique(scoring_technique):
+    if(scoring_technique == "dot_product"):
+        score_function = util.dot_score
+    elif (scoring_technique == "pairwise_dot_product"):
+        score_function = util.pairwise_dot_score
+    elif (scoring_technique == "pairwise_cos_sim"):
+        score_function = util.pairwise_cos_sim
+    else:
+        score_function = util.cos_sim
+    return score_function
 
+
+@st.cache(hash_funcs={torch.Tensor: hash_tensor})
+def search(model_name, scoring_technique, query, window_sizes, granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
@@ -114,14 +123,7 @@ def search(model_name, scoring_technique, query, window_sizes):
         corpus_embeddings = get_embedding(
             model_name, granularized_corpus["windowed"][window_size])
 
-        if(scoring_technique == "dot_product"):
-            score_function = util.dot_score
-        elif (scoring_technique == "pairwise_dot_product"):
-            score_function = util.pairwise_dot_score
-        elif (scoring_technique == "pairwise_cos_sim"):
-            score_function = util.pairwise_cos_sim
-        else:
-            score_function = util.cos_sim
+        score_function = set_scoring_technique(scoring_technique)
 
         semantic_search_result[window_size] = util.semantic_search(
             query_embedding, corpus_embeddings, top_k=corpus_len, score_function=score_function)
@@ -145,16 +147,27 @@ def search(model_name, scoring_technique, query, window_sizes):
     return {"raw": semantic_search_result, "final": final_semantic_search_result}
 
 
-search_result = search(model_name, scoring_technique, query, window_sizes)
+search_result = search(model_name, scoring_technique,
+                       query, window_sizes, granularized_corpus)
+
+query_minimum = ""
+granularized_corpus_minimum = get_granularized_corpus(
+    corpus, granularity, [0], nlp)
+search_result_minimum = search(model_name, scoring_technique,
+                               query_minimum, window_sizes, granularized_corpus_minimum)
+
+query_maximum = query
+granularized_corpus_maximum = get_granularized_corpus(
+    corpus, granularity, [len(granularized_corpus['raw'])], nlp)
+search_result_maximum = search(model_name, scoring_technique,
+                               query_maximum, window_sizes, granularized_corpus_maximum)
 
 percentage = st.number_input(
     "Enter the percentage of the text you want highlighted.", max_value=1.0, min_value=0.0, value=0.3)
 
 
 @st.cache
-def get_filtered_search_result(percentage):
-    global granularized_corpus, search_result, granularity
-
+def get_filtered_search_result(percentage, granularized_corpus, search_result, granularity):
     print_corpus = granularized_corpus["raw"][:]
     cleaned_raw_result = []
     top_k = int(np.ceil(len(print_corpus)*percentage))
@@ -189,7 +202,12 @@ def get_filtered_search_result(percentage):
     return {"print_corpus": print_corpus, "cleaned_raw": cleaned_raw_result, "score_mean": score_mean}
 
 
-filtered_search_result = get_filtered_search_result(percentage)
+filtered_search_result = get_filtered_search_result(
+    percentage, granularized_corpus, search_result, granularity)
+filtered_search_result_minimum = get_filtered_search_result(
+    percentage, granularized_corpus_minimum, search_result_minimum, granularity)
+filtered_search_result_maximum = get_filtered_search_result(
+    percentage, granularized_corpus_maximum, search_result_maximum, granularity)
 
 t1 = time.time()
 
@@ -199,7 +217,11 @@ st.write("{} s".format(t1-t0))
 st.subheader("Output score mean")
 st.caption(
     "Metric to determine how sure the context of query is in the highlighted document.")
-st.write(filtered_search_result["score_mean"])
+st.write("Raw: {}" % (filtered_search_result["score_mean"]))
+st.write("Minimum: {}" % (filtered_search_result_minimum["score_mean"]))
+st.write("Maximum: {}" % (filtered_search_result_maximum["score_mean"]))
+st.write("Percentage: {}" % (
+    filtered_search_result_minimum["score_mean"]/filtered_search_result_maximum["score_mean"]*100))
 
 st.subheader("Output content")
 st.write(filtered_search_result["print_corpus"], unsafe_allow_html=True)
