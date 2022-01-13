@@ -219,10 +219,10 @@ st.write("{} s".format(t1-t0))
 st.subheader("Output score mean")
 st.caption(
     "Metric to determine how sure the context of query is in the highlighted document.")
-st.write("Raw: {}" % (filtered_search_result["score_mean"]))
-st.write("Minimum: {}" % (filtered_search_result_minimum["score_mean"]))
-st.write("Maximum: {}" % (filtered_search_result_maximum["score_mean"]))
-st.write("Percentage: {}" % (
+st.write("Raw: {}".format(filtered_search_result["score_mean"]))
+st.write("Minimum: {}".format(filtered_search_result_minimum["score_mean"]))
+st.write("Maximum: {}".format(filtered_search_result_maximum["score_mean"]))
+st.write("Percentage: {}".format(
     filtered_search_result_minimum["score_mean"]/filtered_search_result_maximum["score_mean"]*100))
 
 st.subheader("Output content")
