@@ -151,16 +151,18 @@ search_result = search(model_name, scoring_technique,
                        query, window_sizes, granularized_corpus)
 
 query_minimum = ""
+window_sizes_minimum = [0]
 granularized_corpus_minimum = get_granularized_corpus(
-    corpus, granularity, [0], nlp)
+    corpus, granularity, window_sizes_minimum, nlp)
 search_result_minimum = search(model_name, scoring_technique,
-                               query_minimum, window_sizes, granularized_corpus_minimum)
+                               query_minimum, window_sizes_minimum, granularized_corpus_minimum)
 
 query_maximum = query
+window_sizes_maximum = [len(granularized_corpus['raw'])]
 granularized_corpus_maximum = get_granularized_corpus(
-    corpus, granularity, [len(granularized_corpus['raw'])], nlp)
+    corpus, granularity, window_sizes_maximum, nlp)
 search_result_maximum = search(model_name, scoring_technique,
-                               query_maximum, window_sizes, granularized_corpus_maximum)
+                               query_maximum, window_sizes_maximum, granularized_corpus_maximum)
 
 percentage = st.number_input(
     "Enter the percentage of the text you want highlighted.", max_value=1.0, min_value=0.0, value=0.3)
