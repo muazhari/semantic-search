@@ -198,16 +198,16 @@ st.write("{} s".format(t1-t0))
 
 st.subheader("Output score mean")
 st.caption(
-    "Metric to determine how sure the context of query is in the highlighted document")
+    "Metric to determine how sure the context of query is in the highlighted document.")
 st.write(filtered_search_result["score_mean"])
 
 st.subheader("Output content")
 st.write(filtered_search_result["print_corpus"], unsafe_allow_html=True)
 
 st.subheader("Raw semantic search results")
-st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the document")
+st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the document.")
 st.write(filtered_search_result["cleaned_raw"])
 
 st.subheader("Results of granularized corpus (segmentation/tokenization)")
-st.caption("This shows the representation that the webapp gets of the input document. Useful for debugging if you get strange output")
+st.caption("This shows the representation that the webapp gets of the input document. Useful for debugging if you get strange output.")
 st.write(granularized_corpus["raw"])
