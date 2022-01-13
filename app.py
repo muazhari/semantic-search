@@ -50,7 +50,7 @@ granularity = st.radio(
     "What level of granularity do you want to search at?", ('sentence', 'word', 'paragraph'))
 query = st.text_area('Enter a query.')
 window_sizes = st.text_area(
-    'Enter a list of window sizes that seperated by a space.')
+    'Enter a list of window sizes that seperated by a space.', value='1')
 window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 
 
