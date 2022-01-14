@@ -159,7 +159,7 @@ granularized_corpus_minimum = get_granularized_corpus(
 search_result_minimum = search(model_name, scoring_technique,
                                query_minimum, window_sizes_minimum, granularized_corpus_minimum)
 
-query_maximum = query
+query_maximum = corpus
 window_sizes_maximum = [len(granularized_corpus["raw"])]
 granularized_corpus_maximum = get_granularized_corpus(
     corpus, granularity, window_sizes_maximum, nlp)
