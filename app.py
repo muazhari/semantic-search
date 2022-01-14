@@ -47,10 +47,10 @@ def get_embeddings(model_name, data):
 
 corpus = st.text_area('Enter a document.')
 granularity = st.radio(
-    "What level of granularity do you want to search at?", ('word', 'sentence', 'paragraph'), index=2)
+    "What level of granularity do you want to search at?", ('word', 'sentence', 'paragraph'), index=1)
 query = st.text_area('Enter a query.')
 window_sizes = st.text_area(
-    'Enter a list of window sizes that seperated by a space.', value=1)
+    'Enter a list of window sizes that seperated by a space.', value='1')
 window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 percentage = st.number_input(
     "Enter the percentage of the text you want highlighted.", max_value=1.0, min_value=0.0, value=0.3)
@@ -203,10 +203,10 @@ def get_filtered_search_result(percentage, granularized_corpus, search_result, g
     return {"print_corpus": print_corpus, "cleaned_raw": cleaned_raw_result, "score_mean": score_mean}
 
 
-filtered_search_result = get_filtered_search_result(
-    percentage, granularized_corpus, search_result, granularity)
 filtered_search_result_minimum = get_filtered_search_result(
     percentage, granularized_corpus_minimum, search_result_minimum, granularity)
+filtered_search_result = get_filtered_search_result(
+    percentage, granularized_corpus, search_result, granularity)
 filtered_search_result_maximum = get_filtered_search_result(
     percentage, granularized_corpus_maximum, search_result_maximum, granularity)
 
