@@ -38,7 +38,7 @@ def get_model(model_name):
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor})
-def get_embedding(model_name, data):
+def get_embeddings(model_name, data):
     model = get_model(model_name)
     query_embedding = model.encode(
         data, convert_to_tensor=True).to('cuda')
@@ -94,7 +94,7 @@ def get_granularized_corpus(corpus, granularity, window_sizes, nlp):
 granularized_corpus = get_granularized_corpus(
     corpus, granularity, window_sizes, nlp)
 
-query_embedding = get_embedding(model_name, [query])
+query_embedding = get_embeddings(model_name, [query])
 
 
 @st.cache
@@ -115,18 +115,18 @@ def search(model_name, scoring_technique, query, window_sizes, granularized_corp
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
-    query_embedding = get_embedding(model_name, [query])
+    query_embeddings = get_embeddings(model_name, [query])
 
     for window_size in window_sizes:
         corpus_len = len(granularized_corpus["windowed"][window_size])
 
-        corpus_embeddings = get_embedding(
+        corpus_embeddings = get_embeddings(
             model_name, granularized_corpus["windowed"][window_size])
 
         score_function = set_scoring_technique(scoring_technique)
 
         semantic_search_result[window_size] = util.semantic_search(
-            query_embedding, corpus_embeddings, top_k=corpus_len, score_function=score_function)
+            query_embeddings, corpus_embeddings, top_k=corpus_len, score_function=score_function)
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size][0]:
@@ -158,7 +158,7 @@ search_result_minimum = search(model_name, scoring_technique,
                                query_minimum, window_sizes_minimum, granularized_corpus_minimum)
 
 query_maximum = query
-window_sizes_maximum = [len(search_result["final"].items())]
+window_sizes_maximum = [len(granularized_corpus["raw"].items())]
 granularized_corpus_maximum = get_granularized_corpus(
     corpus, granularity, window_sizes_maximum, nlp)
 search_result_maximum = search(model_name, scoring_technique,
