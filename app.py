@@ -126,7 +126,7 @@ percentage = st.number_input(
     "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
 
 
-@st.cache()
+@st.cache
 def get_granularized_corpus(corpus, granularity, window_sizes):
     granularized_corpus = []  # [string, ...]
     granularized_corpus_windowed = {}  # {"window_size": [(string,...), ...]}
@@ -174,17 +174,15 @@ if(None not in [corpus, granularity, window_sizes]):
 def retrieval_search(queries, embeddings, limit):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit=limit)]
 
+
 # @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
-
-
 def rerank_search(queries, embeddings, similarity, limit):
     results = [result['text']
                for result in retrieval_search(queries, embeddings, limit)]
     return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
 
+
 # @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
-
-
 def search(model_name, query, window_sizes, granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
@@ -225,7 +223,7 @@ if(None not in [model_name, query, window_sizes, granularized_corpus]):
         model_name, query, window_sizes, granularized_corpus)
 
 
-@st.cache()
+@st.cache
 def get_filtered_search_result(percentage, granularized_corpus, search_result, granularity):
     html_raw = granularized_corpus["raw"][:]
     dict_raw = []
