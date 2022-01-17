@@ -16,7 +16,7 @@ import re
 
 import pdfkit
 from pyvirtualdisplay import Display
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from pdfrw import PdfReader, PdfWriter
 import base64
 
 import uuid
@@ -99,28 +99,27 @@ if (corpus_source_type in ['web']):
 
 pdf_splitted_page_file = None
 
-if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
-    pdf_file = pdf_result['file_name']
-    file_name = os.path.splitext(pdf_file)[0]
-    pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
-    pdf_writer = PdfFileWriter()
+if(None not in [pdf_result]):
+    if (corpus_source_type in ['document', 'web']):
+        pdf_file = pdf_result['file_name']
+        file_name = os.path.splitext(pdf_file)[0]
+        pdf_reader = PdfReader(pdf_file)
+        pdf_max_page = len(pdf_reader.pages)
+        pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
+        pdf_writer = PdfWriter(pdf_splitted_page_file)
 
-    pdf_max_page = pdf_reader.getNumPages()
+        start_page = st.number_input(
+            f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+        end_page = st.number_input(
+            f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-    start_page = st.number_input(
-        f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
-    end_page = st.number_input(
-        f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+        for page_num in range(start_page - 1, end_page):
+            pdf_writer.addpage(pdf_reader.pages[page_num])
 
-    for page_num in range(start_page - 1, end_page):
-        pdf_writer.addPage(pdf_reader.getPage(page_num))
+        pdf_writer.write()
 
-    pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
-    with open(pdf_splitted_page_file, 'wb') as out:
-        pdf_writer.write(out)
-
-    textractor = Textractor()
-    corpus = textractor(pdf_splitted_page_file)
+        textractor = Textractor()
+        corpus = textractor(pdf_splitted_page_file)
 
 
 query = st.text_area('Enter a query.')

@@ -3,7 +3,7 @@ numpy
 torch
 nltk
 pdfkit
-PyPDF2
+pdfrw
 pyvirtualdisplay
 sentence_transformers
 spacy
