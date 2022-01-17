@@ -60,11 +60,9 @@ pdf_result = []  # [{"url": string, "file_name":numeric}]
 
 if(corpus_source_type in ["text", "web"]):
     pdf_result = []
-    corpus = ""
     corpus = st.text_area('Enter a corpus.')
 
 if (corpus_source_type in ['document']):
-    corpus = ""
     uploaded_file = st.file_uploader(
         "Upload a document", type=['pdf', 'doc', 'docx'], accept_multiple_files=False)
     if uploaded_file is not None:
