@@ -16,9 +16,7 @@ from txtai.pipeline import Similarity, Segmentation, Textractor
 import re
 
 import pdfkit
-from pdf2image import convert_from_path
-from IPython.display import display
-import pyvirtualdisplay
+from pyvirtualdisplay import Display
 from txtmarker.factory import Factory
 import base64
 
@@ -45,7 +43,7 @@ def hash_tensor(x):
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor})
 def get_embeddings(model_name, data):
-    embeddings = txtai.embeddings.Embeddings(
+    embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True})
     embeddings.index([(id, text, None) for id, text in enumerate(data)])
     return embeddings
@@ -68,7 +66,7 @@ if (corpus_source_type == 'web'):
         'margin-left': '1.00in',
     }
 
-    with pyvirtualdisplay.Display():
+    with Display():
         for url in urls:
             file_name = "{}.pdf".format(str(uuid.uuid4()))
             file_path = file_name
@@ -77,7 +75,7 @@ if (corpus_source_type == 'web'):
             pdf_result.append(new_pdf)
 
     pdf = pdf_result[0]['file_name']
-    textractor = txtai.pipeline.Textractor()
+    textractor = Textractor()
     corpus = textractor(pdf)
 
 query = st.text_area('Enter a query.')
@@ -98,12 +96,12 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
     granularized_corpus_windowed_indexed = {}
 
     if granularity == "sentence":
-        segmentation = txtai.pipeline.Segmentation(sentences=True)
+        segmentation = Segmentation(sentences=True)
         granularized_corpus = segmentation(corpus)
     elif granularity == "word":
         granularized_corpus += corpus.split(" ")
     elif granularity == "paragraph":
-        segmentation = txtai.pipeline.Segmentation(paragraphs=True)
+        segmentation = Segmentation(paragraphs=True)
         granularized_corpus = segmentation(corpus)
 
     for window_size in window_sizes:
@@ -155,7 +153,7 @@ def search(model_name, query, window_sizes, granularized_corpus):
         corpus_embeddings = get_embeddings(
             model_name, granularized_corpus["windowed"][window_size])
 
-        # similarity = txtai.pipeline.Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        # similarity = Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
         # semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
 
         semantic_search_result[window_size] = retrieval_search(
