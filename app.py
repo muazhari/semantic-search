@@ -101,23 +101,24 @@ pdf_splitted_page_file = None
 
 if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
     pdf_file = pdf_result['file_name']
-    file_name = os.path.splitext(pdf_file)[0]
-    pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
-    pdf_writer = PdfFileWriter()
+    pdf_splitted_page_file = pdf_file
+    # file_name = os.path.splitext(pdf_file)[0]
+    # pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
+    # pdf_writer = PdfFileWriter()
 
-    pdf_max_page = pdf_reader.getNumPages()
+    # pdf_max_page = pdf_reader.getNumPages()
 
-    start_page = st.number_input(
-        f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
-    end_page = st.number_input(
-        f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+    # start_page = st.number_input(
+    #     f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+    # end_page = st.number_input(
+    #     f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-    for page_num in range(start_page - 1, end_page):
-        pdf_writer.addPage(pdf_reader.getPage(page_num))
+    # for page_num in range(start_page - 1, end_page):
+    #     pdf_writer.addPage(pdf_reader.getPage(page_num))
 
-    pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
-    with open(pdf_splitted_page_file, 'wb') as out:
-        pdf_writer.write(out)
+    # pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
+    # with open(pdf_splitted_page_file, 'wb') as out:
+    #     pdf_writer.write(out)
 
     textractor = Textractor()
     corpus = textractor(pdf_splitted_page_file)
@@ -272,7 +273,18 @@ if(None not in [percentage, granularized_corpus, search_result, granularity]):
         percentage, granularized_corpus, search_result, granularity)
 
 
-html_pdf = None
+@st.cache(allow_output_mutation=True)
+def get_html_pdf(file):
+    # Opening file from file path
+    with open(file, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+
+    # Embedding PDF in HTML
+    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
+
+    return pdf_display
+
+
 if(None not in [filtered_search_result, granularized_corpus]):
     if(None not in [pdf_splitted_page_file]):
         if(corpus_source_type in ["document", "web"]):
@@ -292,11 +304,7 @@ if(None not in [filtered_search_result, granularized_corpus]):
             highlighter = Factory.create("pdf")
             highlighter.highlight(path_raw, path_highlighted, highlights)
 
-            with open(path_highlighted, "rb") as f:
-                base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-
-            # Embedding PDF in HTML
-            html_pdf = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
+            html_pdf = get_html_pdf(path_highlighted)
 
     t1 = time.time()
 
