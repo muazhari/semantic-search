@@ -91,6 +91,7 @@ if (corpus_source_type in ['web']):
         new_pdf = {"url": url, "file_name": file_name}
         pdf_result = new_pdf
 
+pdf_splitted_page_file = None
 
 if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
     pdf_file = pdf_result['file_name']
