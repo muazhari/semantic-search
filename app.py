@@ -59,7 +59,6 @@ corpus_source_type = st.radio(
 pdf_result = {}  # {"url": string, "file_name":numeric}
 
 if(corpus_source_type in ["text", "web"]):
-    pdf_result = []
     corpus = st.text_area('Enter a corpus.')
 
 if (corpus_source_type in ['document']):
