@@ -2,8 +2,6 @@ import torch
 import re
 import streamlit as st
 import more_itertools
-import spacy
-from sentence_transformers import SentenceTransformer, util
 import numpy as np
 import time
 import io
@@ -12,7 +10,8 @@ import urllib
 import bs4
 import nltk
 
-import txtai
+from txtai.embeddings import Embeddings
+from txtai.pipeline import Similarity, Segmentation, Textractor
 
 import re
 

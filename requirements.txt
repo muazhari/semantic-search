@@ -1,4 +1,14 @@
-streamlit
+numpy
+nltk
+more_itertools
+torch
+beautifulsoup4
+ipython
+pdf2image
+pdfkit
+pyvirtualdisplay
 sentence_transformers
 spacy
-more_itertools
+streamlit
+txtai
+txtmarker
