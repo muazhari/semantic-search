@@ -22,6 +22,8 @@ import base64
 
 import uuid
 
+import tokenizers
+
 t0 = time.time()
 
 st.set_page_config(page_title="context-search")
@@ -41,7 +43,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: None})
 def get_embeddings(model_name, data):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True})
