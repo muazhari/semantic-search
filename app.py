@@ -88,8 +88,9 @@ if (corpus_source_type == 'web'):
 
 
 if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
-    file_name = os.path.splitext(pdf_result[0]['file_name'])[0]
-    pdf_reader = PdfFileReader(open(file_name, 'rb'))
+    pdf_file = pdf_result[0]['file_name']
+    file_name = os.path.splitext(pdf_file)[0]
+    pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
     pdf_writer = PdfFileWriter()
 
     pdf_max_page = pdf_reader.getNumPages()
