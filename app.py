@@ -300,6 +300,7 @@ if(None not in [filtered_search_result, granularized_corpus]):
                 highlight = (name, text)
                 highlights.append(highlight)
 
+            print([path_raw, path_highlighted, pdf_splitted_page_file])
             print(len(highlights))
             print(highlights)
             # Create annotated file
