@@ -260,7 +260,6 @@ filtered_search_result = get_filtered_search_result(
     percentage, granularized_corpus, search_result, granularity)
 
 
-@st.cache(allow_output_mutation=True)
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
