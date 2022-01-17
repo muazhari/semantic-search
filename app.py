@@ -29,7 +29,13 @@ t0 = time.time()
 
 st.set_page_config(page_title="context-search")
 
-nltk.download('punkt')
+
+@st.cache
+def load_nltk():
+    nltk.download('punkt')
+
+
+load_nltk()
 
 model_name = st.text_area(
     "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.",
