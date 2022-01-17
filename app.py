@@ -87,7 +87,7 @@ if (corpus_source_type == 'web'):
             pdf_result.append(new_pdf)
 
 
-if (corpus_source_type in ['document', 'web']):
+if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
     file_name = os.path.splitext(pdf_result[0]['file_name'])[0]
     pdf_reader = PdfFileReader(open(file_name, 'rb'))
     pdf_writer = PdfFileWriter()
@@ -264,8 +264,8 @@ def get_html_pdf(file):
 
 
 if(corpus_source_type in ["document", "web"]):
-    path_raw = pdf_result[0]['file_name']
-    path_highlighted = "highlighted_{}".format(pdf_result[0]['file_name'])
+    path_raw = pdf_splitted_page_filename
+    path_highlighted = "highlighted_{}".format(pdf_splitted_page_filename)
 
     highlights = []
     for val in filtered_search_result['dict_raw']:
