@@ -22,7 +22,7 @@ import base64
 import uuid
 import os
 
-import tokenizer
+import tokenizers
 import sqlite3
 
 t0 = time.time()
@@ -44,7 +44,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizer: lambda x: None, sqlite3: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3: lambda x: None})
 def get_embeddings(model_name, data):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True})
