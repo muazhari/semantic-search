@@ -272,17 +272,7 @@ if(None not in [percentage, granularized_corpus, search_result, granularity]):
         percentage, granularized_corpus, search_result, granularity)
 
 
-def get_html_pdf(file):
-    # Opening file from file path
-    with open(file, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-
-    # Embedding PDF in HTML
-    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
-
-    return pdf_display
-
-
+html_pdf = None
 if(None not in [filtered_search_result, granularized_corpus]):
     if(None not in [pdf_splitted_page_file]):
         if(corpus_source_type in ["document", "web"]):
@@ -302,7 +292,11 @@ if(None not in [filtered_search_result, granularized_corpus]):
             highlighter = Factory.create("pdf")
             highlighter.highlight(path_raw, path_highlighted, highlights)
 
-            html_pdf = get_html_pdf(path_highlighted)
+            with open(path_highlighted, "rb") as f:
+                base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+
+            # Embedding PDF in HTML
+            html_pdf = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
 
     t1 = time.time()
 
