@@ -64,7 +64,7 @@ if(corpus_source_type in ["text", "web"]):
 
 if (corpus_source_type in ['document']):
     uploaded_file = st.file_uploader(
-        "Upload a document", type=['pdf', 'doc', 'docx'], single_file=True)
+        "Upload a document", type=['pdf', 'doc', 'docx'], accept_multiple_files=False)
     if uploaded_file is not None:
         file_name = "{}.pdf".format(str(uuid.uuid4()))
         with open(file_name, "wb") as f:
