@@ -6,8 +6,6 @@ import numpy as np
 import time
 import io
 
-import urllib
-import bs4
 import nltk
 
 from txtai.embeddings import Embeddings
