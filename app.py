@@ -297,6 +297,7 @@ if(None not in [filtered_search_result, granularized_corpus]):
                 corpus_id = val['corpus_id']
                 corpus_text = granularized_corpus["raw"][corpus_id]
                 text = re.escape(corpus_text)
+                text = corpus_text
                 highlight = (name, text)
                 highlights.append(highlight)
 
