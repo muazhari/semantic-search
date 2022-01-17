@@ -94,11 +94,11 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
     # {window_size: [({"corpus": string, "index": numeric}, ...), ...]}
     granularized_corpus_windowed_indexed = {}
 
-    if granularity == "sentence":
+    if granularity == "word":
+        granularized_corpus += corpus.split(" ")
+    elif granularity == "sentence":
         segmentation = Segmentation(sentences=True)
         granularized_corpus = segmentation(corpus)
-    elif granularity == "word":
-        granularized_corpus += corpus.split(" ")
     elif granularity == "paragraph":
         segmentation = Segmentation(paragraphs=True)
         granularized_corpus = segmentation(corpus)
@@ -182,7 +182,7 @@ search_result = search(model_name, query, window_sizes, granularized_corpus)
 
 @st.cache()
 def get_filtered_search_result(percentage, granularized_corpus, search_result, granularity):
-    html_raw = granularized_corpus["raw"]
+    html_raw = granularized_corpus["raw"][:]
     dict_raw = []
     top_k = int(np.ceil(len(granularized_corpus["raw"])*percentage))
     score_mean = 0
