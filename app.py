@@ -105,13 +105,14 @@ if(None not in [pdf_result]):
         file_name = os.path.splitext(pdf_file)[0]
         pdf_reader = PdfReader(pdf_file)
         pdf_max_page = len(pdf_reader.pages)
-        pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
-        pdf_writer = PdfWriter(pdf_splitted_page_file)
 
         start_page = st.number_input(
             f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
         end_page = st.number_input(
             f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+
+        pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
+        pdf_writer = PdfWriter(pdf_splitted_page_file)
 
         for page_num in range(start_page - 1, end_page):
             pdf_writer.addpage(pdf_reader.pages[page_num])
