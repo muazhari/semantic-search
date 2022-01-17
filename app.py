@@ -182,7 +182,7 @@ search_result = search(model_name, query, window_sizes, granularized_corpus)
 
 @st.cache()
 def get_filtered_search_result(percentage, granularized_corpus, search_result, granularity):
-    html_raw = granularized_corpus["raw"][:]
+    html_raw = granularized_corpus["raw"]
     dict_raw = []
     top_k = int(np.ceil(len(granularized_corpus["raw"])*percentage))
     score_mean = 0
@@ -200,6 +200,10 @@ def get_filtered_search_result(percentage, granularized_corpus, search_result, g
         dict_raw.append(
             {"corpus_id": key, "score": val["score_mean"]})
 
+        annotated = "<mark style='background-color: lightgreen'>{}</mark>".format(
+            html_raw[key])
+        html_raw[key] = annotated
+
     if(granularity == 'sentence' or granularity == 'word'):
         html_raw = " ".join(html_raw)
     elif(granularity == 'paragraph'):
@@ -215,7 +219,7 @@ filtered_search_result = get_filtered_search_result(
 
 
 @st.cache()
-def displayPDF(file):
+def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
         base64_pdf = base64.b64encode(f.read()).decode('utf-8')
@@ -223,8 +227,7 @@ def displayPDF(file):
     # Embedding PDF in HTML
     pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
 
-    # Displaying File
-    st.markdown(pdf_display, unsafe_allow_html=True)
+    return pdf_display
 
 
 if(corpus_source_type in ["document", "web"]):
@@ -244,6 +247,7 @@ if(corpus_source_type in ["document", "web"]):
     highlighter = Factory.create("pdf")
     highlighter.highlight(path_raw, path_highlighted, highlights)
 
+    html_pdf = get_html_pdf(path_highlighted)
 
 t1 = time.time()
 
@@ -257,7 +261,7 @@ st.write(filtered_search_result["score_mean"])
 
 st.subheader("Output content")
 if(corpus_source_type in ["document", "web"]):
-    displayPDF(path_highlighted)
+    st.markdown(html_pdf, unsafe_allow_html=True)
 else:
     st.write(filtered_search_result["html_raw"], unsafe_allow_html=True)
 
