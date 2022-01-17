@@ -11,4 +11,3 @@ streamlit
 txtai
 txtmarker
 faiss-gpu
-pdf2image

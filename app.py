@@ -25,10 +25,6 @@ import os
 import tokenizers
 import sqlite3
 
-
-from pdf2image import convert_from_path
-from IPython.display import display
-
 t0 = time.time()
 
 st.set_page_config(page_title="context-search")
@@ -310,11 +306,6 @@ if(None not in [filtered_search_result, granularized_corpus]):
             # Create annotated file
             highlighter = Factory.create("pdf")
             highlighter.highlight(path_raw, path_highlighted, highlights)
-
-            images = convert_from_path(
-                path_highlighted, size=(800, None), single_file=False)
-            for image in images:
-                display(image)
 
             html_pdf = get_html_pdf(path_highlighted)
 
