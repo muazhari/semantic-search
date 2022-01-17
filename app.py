@@ -44,7 +44,8 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(allow_output_mutation=True)
 def get_embeddings(model_name, data):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True})
@@ -95,26 +96,25 @@ if (corpus_source_type in ['web']):
 if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
     pdf_file = pdf_result['file_name']
     file_name = os.path.splitext(pdf_file)[0]
-    pdf_splitted_page_file = pdf_file
-    # pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
-    # pdf_writer = PdfFileWriter()
+    pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
+    pdf_writer = PdfFileWriter()
 
-    # pdf_max_page = pdf_reader.getNumPages()
+    pdf_max_page = pdf_reader.getNumPages()
 
-    # start_page = st.number_input(
-    #     f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
-    # end_page = st.number_input(
-    #     f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+    start_page = st.number_input(
+        f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+    end_page = st.number_input(
+        f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-    # for page_num in range(start_page - 1, end_page):
-    #     pdf_writer.addPage(pdf_reader.getPage(page_num))
+    for page_num in range(start_page - 1, end_page):
+        pdf_writer.addPage(pdf_reader.getPage(page_num))
 
-    # pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
-    # with open(pdf_splitted_page_file, 'wb') as out:
-    #     pdf_writer.write(out)
+    pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
+    with open(pdf_splitted_page_file, 'wb') as out:
+        pdf_writer.write(out)
 
-    # textractor = Textractor()
-    # corpus = textractor(pdf_splitted_page_file)
+    textractor = Textractor()
+    corpus = textractor(pdf_splitted_page_file)
 
 
 query = st.text_area('Enter a query.')
@@ -171,19 +171,19 @@ granularized_corpus = get_granularized_corpus(
 
 # result = {"id": string, "text": string, "score": numeric}
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(allow_output_mutation=True)
 def retrieval_search(queries, embeddings, limit):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit=limit)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(allow_output_mutation=True)
 def rerank_search(queries, embeddings, similarity, limit):
     results = [result['text']
                for result in retrieval_search(queries, embeddings, limit)]
     return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(allow_output_mutation=True)
 def search(model_name, query, window_sizes, granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
@@ -260,7 +260,6 @@ filtered_search_result = get_filtered_search_result(
     percentage, granularized_corpus, search_result, granularity)
 
 
-@st.cache(allow_output_mutation=True)
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
