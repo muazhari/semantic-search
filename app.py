@@ -10,16 +10,17 @@ import nltk
 
 from txtai.embeddings import Embeddings
 from txtai.pipeline import Similarity, Segmentation, Textractor
+from txtmarker.factory import Factory
 
 import re
 
 import pdfkit
 from pyvirtualdisplay import Display
-from txtmarker.factory import Factory
+from PyPDF2 import PdfFileReader, PdfFileWriter
 import base64
 
 import uuid
-
+import os
 
 t0 = time.time()
 
@@ -52,10 +53,22 @@ corpus = st.text_area('Enter a corpus.')
 corpus_source_type = st.radio(
     "What is corpus source type?", ('text', 'document', 'web'), index=0)
 
+pdf_result = []  # [{"url": string, "file_name":numeric}]
+
+if (corpus_source_type == 'document'):
+    uploaded_file = st.file_uploader(
+        "Upload a document", type=['pdf', 'doc', 'docx'])
+    if uploaded_file is not None:
+        file_name = "{}.pdf".format(str(uuid.uuid4()))
+        with open(file_name, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        pdf_result.append({"url": None, "file_name": file_name})
+        st.success("File saved!")
+
+
 if (corpus_source_type == 'web'):
     urls = [corpus]
-
-    pdf_result = []  # [{"url": string, "file_name":numeric}]
 
     options = {
         'page-size': 'Letter',
@@ -73,9 +86,29 @@ if (corpus_source_type == 'web'):
             new_pdf = {"url": url, "file_name": file_name}
             pdf_result.append(new_pdf)
 
-    pdf = pdf_result[0]['file_name']
+
+if (corpus_source_type in ['document', 'web']):
+    file_name = os.path.splitext(pdf_result[0]['file_name'])[0]
+    pdf_reader = PdfFileReader(open(file_name, 'rb'))
+    pdf_writer = PdfFileWriter()
+
+    pdf_max_page = pdf_reader.getNumPages()
+
+    start_page = st.number_input(
+        "Enter the start page of the pdf you want to be highlighted.", min_value=1, max_value=pdf_max_page, value=1)
+    end_page = st.number_input(
+        "Enter the end page of the pdf you want to be highlighted.", min_value=1, max_value=pdf_max_page, value=1)
+
+    for page_num in range(start_page - 1, end_page):
+        pdf_writer.addPage(pdf_reader.getPage(page_num))
+
+    pdf_splitted_page_filename = f'{file_name}_{start_page}_page_{end_page}.pdf'
+    with open(pdf_splitted_page_filename, 'wb') as out:
+        pdf_writer.write(out)
+
     textractor = Textractor()
-    corpus = textractor(pdf)
+    corpus = textractor(pdf_splitted_page_filename)
+
 
 query = st.text_area('Enter a query.')
 granularity = st.radio(
@@ -84,7 +117,7 @@ window_sizes = st.text_area(
     'Enter a list of window sizes that seperated by a space.', value='1')
 window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 percentage = st.number_input(
-    "Enter the percentage of the text you want highlighted.", max_value=1.0, min_value=0.0, value=0.3)
+    "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
 
 
 @st.cache()
@@ -231,8 +264,8 @@ def get_html_pdf(file):
 
 
 if(corpus_source_type in ["document", "web"]):
-    path_raw = pdf
-    path_highlighted = "highlighted_{}".format(pdf)
+    path_raw = pdf_result[0]['file_name']
+    path_highlighted = "highlighted_{}".format(pdf_result[0]['file_name'])
 
     highlights = []
     for val in filtered_search_result['dict_raw']:
