@@ -22,7 +22,7 @@ import base64
 import uuid
 import os
 
-import tokenizers
+import tokenizer
 import sqlite3
 
 t0 = time.time()
@@ -44,7 +44,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizer: lambda x: None, sqlite3: lambda x: None})
 def get_embeddings(model_name, data):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True})
@@ -126,7 +126,7 @@ percentage = st.number_input(
     "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers: lambda x: None, sqlite3: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizer: lambda x: None, sqlite3: lambda x: None})
 def get_granularized_corpus(corpus, granularity, window_sizes):
     granularized_corpus = []  # [string, ...]
     granularized_corpus_windowed = {}  # {"window_size": [(string,...), ...]}
