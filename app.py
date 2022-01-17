@@ -20,8 +20,6 @@ import base64
 
 import uuid
 
-import tokenizers
-import sqlite3
 
 t0 = time.time()
 
