@@ -8,28 +8,11 @@ import numpy as np
 import time
 import io
 
-import urllib
-import bs4
-import nltk
-
-import txtai
-
-import re
-
-import pdfkit
-from pdf2image import convert_from_path
-from IPython.display import display
-import pyvirtualdisplay
-from txtmarker.factory import Factory
-import base64
-
-import uuid
-
 t0 = time.time()
 
 st.set_page_config(page_title="context-search")
 
-nltk.download('punkt')
+nlp = spacy.load('en_core_web_sm')
 
 model_name = st.text_area(
     "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.",
@@ -38,49 +21,31 @@ st.caption("This will download a new model, so it may take awhile or even break 
 st.caption("See the list of pre-trained models that are available here! https://www.sbert.net/docs/pretrained_models.html.")
 
 
+scoring_technique = st.radio(
+    "Enter the scoring technique based on suitable score function in selected pre-trained model from sentence transformers.", ("cos_sim", "dot_product", 'pairwise_cos_sim', 'pairwise_dot_product'), index=0)
+
+
 def hash_tensor(x):
     bio = io.BytesIO()
     torch.save(x, bio)
     return bio.getvalue()
 
 
+@st.cache(allow_output_mutation=True)
+def get_model(model_name):
+    model = SentenceTransformer(model_name, device='cuda')
+    return model
+
+
 @st.cache(hash_funcs={torch.Tensor: hash_tensor})
 def get_embeddings(model_name, data):
-    embeddings = txtai.embeddings.Embeddings(
-        {"path": model_name, "content": True, "objects": True})
-    embeddings.index([(id, text, None) for id, text in enumerate(data)])
-    return embeddings
+    model = get_model(model_name)
+    query_embedding = model.encode(
+        data, convert_to_tensor=True).to('cuda')
+    return query_embedding
 
 
-corpus = st.text_area('Enter a corpus.')
-corpus_source_type = st.radio(
-    "What is corpus source type?", ('text', 'document', 'web'), index=0)
-
-if (corpus_source_type == 'web'):
-    urls = [corpus]
-
-    pdf_result = []  # [{"url": string, "file_name":numeric}]
-
-    options = {
-        'page-size': 'Letter',
-        'margin-top': '0.25in',
-        'margin-right': '1.00in',
-        'margin-bottom': '0.25in',
-        'margin-left': '1.00in',
-    }
-
-    with pyvirtualdisplay.Display():
-        for url in urls:
-            file_name = "{}.pdf".format(str(uuid.uuid4()))
-            file_path = file_name
-            pdfkit.from_url(url, file_path, options=options)
-            new_pdf = {"url": url, "file_name": file_name}
-            pdf_result.append(new_pdf)
-
-    pdf = pdf_result[0]['file_name']
-    textractor = txtai.pipeline.Textractor()
-    corpus = textractor(pdf)
-
+corpus = st.text_area('Enter a document.')
 query = st.text_area('Enter a query.')
 granularity = st.radio(
     "What level of granularity do you want to search at?", ('word', 'sentence', 'paragraph'), index=1)
@@ -91,21 +56,20 @@ percentage = st.number_input(
     "Enter the percentage of the text you want highlighted.", max_value=1.0, min_value=0.0, value=0.3)
 
 
-@st.cache()
-def get_granularized_corpus(corpus, granularity, window_sizes):
-    granularized_corpus = []  # [string, ...]
-    granularized_corpus_windowed = {}  # {"window_size": [(string,...), ...]}
-    # {window_size: [({"corpus": string, "index": numeric}, ...), ...]}
+@st.cache(hash_funcs={spacy.vocab.Vocab: lambda x: None})
+def get_granularized_corpus(corpus, granularity, window_sizes, nlp):
+    granularized_corpus = []  # ["", ...]
+    granularized_corpus_windowed = {}  # {window_size: [("",...), ...]}
+    # {window_size: [({"corpus": "", "index": 0}, ...), ...]}
     granularized_corpus_windowed_indexed = {}
 
     if granularity == "sentence":
-        segmentation = txtai.pipeline.Segmentation(sentences=True)
-        granularized_corpus = segmentation(corpus)
+        doc = nlp(corpus)
+        granularized_corpus = [str(sent) for sent in doc.sents]
     elif granularity == "word":
         granularized_corpus += corpus.split(" ")
     elif granularity == "paragraph":
-        segmentation = txtai.pipeline.Segmentation(paragraphs=True)
-        granularized_corpus = segmentation(corpus)
+        granularized_corpus = corpus.splitlines()
 
     for window_size in window_sizes:
         granularized_corpus_windowed[window_size] = []
@@ -130,25 +94,30 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
 
 
 granularized_corpus = get_granularized_corpus(
-    corpus, granularity, window_sizes)
+    corpus, granularity, window_sizes, nlp)
+
+query_embedding = get_embeddings(model_name, [query])
 
 
-# result = {"id": string, "text": string, "score": numeric}
-
-def retrieval_search(queries, embeddings, limit):
-    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit=limit)]
-
-
-def rerank_search(queries, embeddings, similarity, limit):
-    results = [result['text']
-               for result in retrieval_search(queries, embeddings, limit)]
-    return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
+@st.cache
+def set_scoring_technique(scoring_technique):
+    if(scoring_technique == "dot_product"):
+        score_function = util.dot_score
+    elif (scoring_technique == "pairwise_dot_product"):
+        score_function = util.pairwise_dot_score
+    elif (scoring_technique == "pairwise_cos_sim"):
+        score_function = util.pairwise_cos_sim
+    else:
+        score_function = util.cos_sim
+    return score_function
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor})
-def search(model_name, query, window_sizes, granularized_corpus):
+def search(model_name, scoring_technique, query, window_sizes, granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
+
+    query_embeddings = get_embeddings(model_name, [query])
 
     for window_size in window_sizes:
         corpus_len = len(granularized_corpus["windowed"][window_size])
@@ -156,14 +125,13 @@ def search(model_name, query, window_sizes, granularized_corpus):
         corpus_embeddings = get_embeddings(
             model_name, granularized_corpus["windowed"][window_size])
 
-        # similarity = txtai.pipeline.Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
-        # semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
+        score_function = set_scoring_technique(scoring_technique)
 
-        semantic_search_result[window_size] = retrieval_search(
-            (query), corpus_embeddings, corpus_len)
+        semantic_search_result[window_size] = util.semantic_search(
+            query_embeddings, corpus_embeddings, top_k=corpus_len, score_function=score_function)
 
         # averaging overlapping result
-        for ssr in semantic_search_result[window_size]:
+        for ssr in semantic_search_result[window_size][0]:
             for source_corpus_index in granularized_corpus["windowed_indexed"][window_size][ssr["corpus_id"]]:
                 if(final_semantic_search_result.get(source_corpus_index, None) is None):
                     final_semantic_search_result[source_corpus_index] = {
@@ -181,14 +149,29 @@ def search(model_name, query, window_sizes, granularized_corpus):
     return {"raw": semantic_search_result, "final": final_semantic_search_result}
 
 
-search_result = search(model_name, query, window_sizes, granularized_corpus)
+query_maximum = corpus
+window_sizes_maximum = [len(granularized_corpus["raw"])]
+granularized_corpus_maximum = get_granularized_corpus(
+    corpus, granularity, window_sizes_maximum, nlp)
+search_result_maximum = search(model_name, scoring_technique,
+                               query_maximum, window_sizes_maximum, granularized_corpus_maximum)
+
+search_result = search(model_name, scoring_technique,
+                       query, window_sizes, granularized_corpus)
+
+query_minimum = ""
+window_sizes_minimum = [0]
+granularized_corpus_minimum = get_granularized_corpus(
+    corpus, granularity, window_sizes_minimum, nlp)
+search_result_minimum = search(model_name, scoring_technique,
+                               query_minimum, window_sizes_minimum, granularized_corpus_minimum)
 
 
-@st.cache()
+@st.cache
 def get_filtered_search_result(percentage, granularized_corpus, search_result, granularity):
-    html_raw = granularized_corpus["raw"][:]
-    dict_raw = []
-    top_k = int(np.ceil(len(granularized_corpus["raw"])*percentage))
+    print_corpus = granularized_corpus["raw"][:]
+    shaped_raw_result = []
+    top_k = int(np.ceil(len(print_corpus)*percentage))
     score_mean = 0
     total_count = 0
     for key, val in sorted(search_result["final"].items(), key=lambda x: x[1]["score_mean"], reverse=True)[:top_k]:
@@ -201,53 +184,31 @@ def get_filtered_search_result(percentage, granularized_corpus, search_result, g
             ((new_value-old_score_mean)/new_count)
         score_mean = new_score_mean
 
-        dict_raw.append(
+        shaped_raw_result.append(
             {"corpus_id": key, "score": val["score_mean"]})
 
+        # annotated = "\u0332".join(print_corpus[key])
+        # annotated = "<font color='red'>{}</font>".format(print_corpus[key].splitlines())
+        annotated = "<mark style='background-color: lightgreen'>{}</mark>".format(
+            print_corpus[key])
+        print_corpus[key] = annotated
+
     if(granularity == 'sentence' or granularity == 'word'):
-        html_raw = " ".join(html_raw)
+        print_corpus = " ".join(print_corpus)
     elif(granularity == 'paragraph'):
-        html_raw = "\n".join(html_raw)
+        print_corpus = "\n".join(print_corpus)
 
-    html_raw = '<br />'.join(html_raw.splitlines())
+    print_corpus = '<br />'.join(print_corpus.splitlines())
 
-    return {"html_raw": html_raw, "dict_raw": dict_raw, "score_mean": score_mean}
+    return {"print_corpus": print_corpus, "shaped_raw": shaped_raw_result, "score_mean": score_mean}
 
 
+filtered_search_result_minimum = get_filtered_search_result(
+    percentage, granularized_corpus_minimum, search_result_minimum, granularity)
 filtered_search_result = get_filtered_search_result(
     percentage, granularized_corpus, search_result, granularity)
-
-
-@st.cache()
-def displayPDF(file):
-    # Opening file from file path
-    with open(file, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-
-    # Embedding PDF in HTML
-    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
-
-    # Displaying File
-    st.markdown(pdf_display, unsafe_allow_html=True)
-
-
-if(corpus_source_type in ["document", "web"]):
-    path_raw = pdf
-    path_highlighted = "highlighted_{}".format(pdf)
-
-    highlights = []
-    for val in filtered_search_result['dict_raw']:
-        name = "{:.4f}".format(val['score'])
-        corpus_id = val['corpus_id']
-        corpus_text = granularized_corpus["raw"][corpus_id]
-        text = re.escape(corpus_text)
-        highlight = (name, text)
-        highlights.append(highlight)
-
-    # Create annotated file
-    highlighter = Factory.create("pdf")
-    highlighter.highlight(path_raw, path_highlighted, highlights)
-
+filtered_search_result_maximum = get_filtered_search_result(
+    percentage, granularized_corpus_maximum, search_result_maximum, granularity)
 
 t1 = time.time()
 
@@ -256,19 +217,20 @@ st.write("{} s".format(t1-t0))
 
 st.subheader("Output score mean")
 st.caption(
-    "Metric to determine how sure the context of query is in the highlighted corpus.")
-st.write(filtered_search_result["score_mean"])
+    "Metric to determine how sure the context of query is in the highlighted document.")
+st.write("Raw: {}".format(filtered_search_result["score_mean"]))
+st.write("Minimum: {}".format(filtered_search_result_minimum["score_mean"]))
+st.write("Maximum: {}".format(filtered_search_result_maximum["score_mean"]))
+st.write("Percentage of raw to delta minimum-maximum ratio: {}%".format(
+    filtered_search_result["score_mean"]/(filtered_search_result_maximum["score_mean"]-filtered_search_result_minimum["score_mean"])*100))
 
 st.subheader("Output content")
-if(corpus_source_type in ["document", "web"]):
-    displayPDF(path_highlighted)
-else:
-    st.write(filtered_search_result["html_raw"], unsafe_allow_html=True)
+st.write(filtered_search_result["print_corpus"], unsafe_allow_html=True)
 
 st.subheader("Raw semantic search results")
-st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus.")
-st.write(filtered_search_result["dict_raw"])
+st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the document.")
+st.write(filtered_search_result["shaped_raw"])
 
 st.subheader("Results of granularized corpus (segmentation/tokenization)")
-st.caption("This shows the representation that the webapp gets of the input corpus. Useful for debugging if you get strange output.")
+st.caption("This shows the representation that the webapp gets of the input document. Useful for debugging if you get strange output.")
 st.write(granularized_corpus["raw"])
