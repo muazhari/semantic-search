@@ -56,7 +56,7 @@ corpus_source_type = st.radio(
     "What is corpus source type?", ('text', 'document', 'web'), index=0)
 
 
-pdf_result = []  # [{"url": string, "file_name":numeric}]
+pdf_result = {}  # {"url": string, "file_name":numeric}
 
 if(corpus_source_type in ["text", "web"]):
     pdf_result = []
@@ -70,7 +70,7 @@ if (corpus_source_type in ['document']):
         with open(file_name, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        pdf_result.append({"url": None, "file_name": file_name})
+        pdf_result = {"url": None, "file_name": file_name}
         st.success("File uploaded!")
 
 
@@ -91,11 +91,11 @@ if (corpus_source_type in ['web']):
             file_path = file_name
             pdfkit.from_url(url, file_path, options=options)
             new_pdf = {"url": url, "file_name": file_name}
-            pdf_result.append(new_pdf)
+            pdf_result = new_pdf
 
 
 if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
-    pdf_file = pdf_result[0]['file_name']
+    pdf_file = pdf_result['file_name']
     file_name = os.path.splitext(pdf_file)[0]
     pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
     pdf_writer = PdfFileWriter()
