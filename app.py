@@ -164,8 +164,9 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
     return {"raw": granularized_corpus, "windowed": granularized_corpus_windowed, "windowed_indexed": granularized_corpus_windowed_indexed}
 
 
-granularized_corpus = get_granularized_corpus(
-    corpus, granularity, window_sizes)
+if(None not in [corpus, granularity, window_sizes]):
+    granularized_corpus = get_granularized_corpus(
+        corpus, granularity, window_sizes)
 
 
 # result = {"id": string, "text": string, "score": numeric}
@@ -219,7 +220,9 @@ def search(model_name, query, window_sizes, granularized_corpus):
     return {"raw": semantic_search_result, "final": final_semantic_search_result}
 
 
-search_result = search(model_name, query, window_sizes, granularized_corpus)
+if(None not in [model_name, query, window_sizes, granularized_corpus]):
+    search_result = search(
+        model_name, query, window_sizes, granularized_corpus)
 
 
 @st.cache()
@@ -256,8 +259,9 @@ def get_filtered_search_result(percentage, granularized_corpus, search_result, g
     return {"html_raw": html_raw, "dict_raw": dict_raw, "score_mean": score_mean}
 
 
-filtered_search_result = get_filtered_search_result(
-    percentage, granularized_corpus, search_result, granularity)
+if(None not in [percentage, granularized_corpus, search_result, granularity]):
+    filtered_search_result = get_filtered_search_result(
+        percentage, granularized_corpus, search_result, granularity)
 
 
 def get_html_pdf(file):
@@ -271,45 +275,46 @@ def get_html_pdf(file):
     return pdf_display
 
 
-if(corpus_source_type in ["document", "web"]):
-    path_raw = pdf_splitted_page_file
-    path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
+if(None not in [pdf_splitted_page_file, filtered_search_result, granularized_corpus]):
+    if(corpus_source_type in ["document", "web"]):
+        path_raw = pdf_splitted_page_file
+        path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
 
-    highlights = []
-    for val in filtered_search_result['dict_raw']:
-        name = "{:.4f}".format(val['score'])
-        corpus_id = val['corpus_id']
-        corpus_text = granularized_corpus["raw"][corpus_id]
-        text = re.escape(corpus_text)
-        highlight = (name, text)
-        highlights.append(highlight)
+        highlights = []
+        for val in filtered_search_result['dict_raw']:
+            name = "{:.4f}".format(val['score'])
+            corpus_id = val['corpus_id']
+            corpus_text = granularized_corpus["raw"][corpus_id]
+            text = re.escape(corpus_text)
+            highlight = (name, text)
+            highlights.append(highlight)
 
-    # Create annotated file
-    highlighter = Factory.create("pdf")
-    highlighter.highlight(path_raw, path_highlighted, highlights)
+        # Create annotated file
+        highlighter = Factory.create("pdf")
+        highlighter.highlight(path_raw, path_highlighted, highlights)
 
-    html_pdf = get_html_pdf(path_highlighted)
+        html_pdf = get_html_pdf(path_highlighted)
 
-t1 = time.time()
+    t1 = time.time()
 
-st.subheader("Output process duration")
-st.write("{} s".format(t1-t0))
+    st.subheader("Output process duration")
+    st.write("{} s".format(t1-t0))
 
-st.subheader("Output score mean")
-st.caption(
-    "Metric to determine how sure the context of query is in the highlighted corpus.")
-st.write(filtered_search_result["score_mean"])
+    st.subheader("Output score mean")
+    st.caption(
+        "Metric to determine how sure the context of query is in the highlighted corpus.")
+    st.write(filtered_search_result["score_mean"])
 
-st.subheader("Output content")
-if(corpus_source_type in ["document", "web"]):
-    st.markdown(html_pdf, unsafe_allow_html=True)
-else:
-    st.write(filtered_search_result["html_raw"], unsafe_allow_html=True)
+    st.subheader("Output content")
+    if(corpus_source_type in ["document", "web"]):
+        st.markdown(html_pdf, unsafe_allow_html=True)
+    else:
+        st.write(filtered_search_result["html_raw"], unsafe_allow_html=True)
 
-st.subheader("Raw semantic search results")
-st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus.")
-st.write(filtered_search_result["dict_raw"])
+    st.subheader("Raw semantic search results")
+    st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus.")
+    st.write(filtered_search_result["dict_raw"])
 
-st.subheader("Results of granularized corpus (segmentation/tokenization)")
-st.caption("This shows the representation that the webapp gets of the input corpus. Useful for debugging if you get strange output.")
-st.write(granularized_corpus["raw"])
+    st.subheader("Results of granularized corpus (segmentation/tokenization)")
+    st.caption("This shows the representation that the webapp gets of the input corpus. Useful for debugging if you get strange output.")
+    st.write(granularized_corpus["raw"])
