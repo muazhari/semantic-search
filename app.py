@@ -284,25 +284,26 @@ def get_html_pdf(file):
     return pdf_display
 
 
-if(None not in [pdf_splitted_page_file, filtered_search_result, granularized_corpus]):
-    if(corpus_source_type in ["document", "web"]):
-        path_raw = pdf_splitted_page_file
-        path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
+if(None not in [filtered_search_result, granularized_corpus]):
+    if(None not in [pdf_splitted_page_file]):
+        if(corpus_source_type in ["document", "web"]):
+            path_raw = pdf_splitted_page_file
+            path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
 
-        highlights = []
-        for val in filtered_search_result['dict_raw']:
-            name = "{:.4f}".format(val['score'])
-            corpus_id = val['corpus_id']
-            corpus_text = granularized_corpus["raw"][corpus_id]
-            text = re.escape(corpus_text)
-            highlight = (name, text)
-            highlights.append(highlight)
+            highlights = []
+            for val in filtered_search_result['dict_raw']:
+                name = "{:.4f}".format(val['score'])
+                corpus_id = val['corpus_id']
+                corpus_text = granularized_corpus["raw"][corpus_id]
+                text = re.escape(corpus_text)
+                highlight = (name, text)
+                highlights.append(highlight)
 
-        # Create annotated file
-        highlighter = Factory.create("pdf")
-        highlighter.highlight(path_raw, path_highlighted, highlights)
+            # Create annotated file
+            highlighter = Factory.create("pdf")
+            highlighter.highlight(path_raw, path_highlighted, highlights)
 
-        html_pdf = get_html_pdf(path_highlighted)
+            html_pdf = get_html_pdf(path_highlighted)
 
     t1 = time.time()
 
