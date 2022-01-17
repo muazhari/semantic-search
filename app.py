@@ -55,14 +55,16 @@ def get_embeddings(model_name, data):
 corpus_source_type = st.radio(
     "What is corpus source type?", ('text', 'document', 'web'), index=0)
 
-if(corpus_source_type in ["text", "web"]):
-    corpus = st.text_area('Enter a corpus.')
 
 pdf_result = []  # [{"url": string, "file_name":numeric}]
 
+if(corpus_source_type in ["text", "web"]):
+    pdf_result = []
+    corpus = st.text_area('Enter a corpus.')
+
 if (corpus_source_type in ['document']):
     uploaded_file = st.file_uploader(
-        "Upload a document", type=['pdf', 'doc', 'docx'])
+        "Upload a document", type=['pdf', 'doc', 'docx'], single_file=True)
     if uploaded_file is not None:
         file_name = "{}.pdf".format(str(uuid.uuid4()))
         with open(file_name, "wb") as f:
