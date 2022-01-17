@@ -101,9 +101,9 @@ if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
     pdf_max_page = pdf_reader.getNumPages()
 
     start_page = st.number_input(
-        "Enter the start page of the pdf you want to be highlighted.", min_value=1, max_value=pdf_max_page, value=1)
+        f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
     end_page = st.number_input(
-        "Enter the end page of the pdf you want to be highlighted.", min_value=1, max_value=pdf_max_page, value=1)
+        f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
     for page_num in range(start_page - 1, end_page):
         pdf_writer.addPage(pdf_reader.getPage(page_num))
