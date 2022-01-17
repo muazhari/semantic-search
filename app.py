@@ -25,6 +25,10 @@ import os
 import tokenizers
 import sqlite3
 
+
+from pdf2image import convert_from_path
+from IPython.display import display
+
 t0 = time.time()
 
 st.set_page_config(page_title="context-search")
@@ -297,13 +301,16 @@ if(None not in [filtered_search_result, granularized_corpus]):
                 corpus_id = val['corpus_id']
                 corpus_text = granularized_corpus["raw"][corpus_id]
                 text = re.escape(corpus_text)
-                text = corpus_text
                 highlight = (name, text)
                 highlights.append(highlight)
 
             print([path_raw, path_highlighted, pdf_splitted_page_file])
             print(len(highlights))
             print(highlights)
+            images = convert_from_path(
+                path_highlighted, size=(800, None), single_file=False)
+            for image in images:
+                display(image)
             # Create annotated file
             highlighter = Factory.create("pdf")
             highlighter.highlight(path_raw, path_highlighted, highlights)
