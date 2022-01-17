@@ -164,6 +164,7 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
     return {"raw": granularized_corpus, "windowed": granularized_corpus_windowed, "windowed_indexed": granularized_corpus_windowed_indexed}
 
 
+granularized_corpus = None
 if(None not in [corpus, granularity, window_sizes] and corpus != ""):
     granularized_corpus = get_granularized_corpus(
         corpus, granularity, window_sizes)
@@ -218,6 +219,7 @@ def search(model_name, query, window_sizes, granularized_corpus):
     return {"raw": semantic_search_result, "final": final_semantic_search_result}
 
 
+search_result = None
 if(None not in [model_name, query, window_sizes, granularized_corpus]):
     search_result = search(
         model_name, query, window_sizes, granularized_corpus)
@@ -257,6 +259,7 @@ def get_filtered_search_result(percentage, granularized_corpus, search_result, g
     return {"html_raw": html_raw, "dict_raw": dict_raw, "score_mean": score_mean}
 
 
+filtered_search_result = None
 if(None not in [percentage, granularized_corpus, search_result, granularity]):
     filtered_search_result = get_filtered_search_result(
         percentage, granularized_corpus, search_result, granularity)
