@@ -307,13 +307,14 @@ if(None not in [filtered_search_result, granularized_corpus]):
             print([path_raw, path_highlighted, pdf_splitted_page_file])
             print(len(highlights))
             print(highlights)
+            # Create annotated file
+            highlighter = Factory.create("pdf")
+            highlighter.highlight(path_raw, path_highlighted, highlights)
+
             images = convert_from_path(
                 path_highlighted, size=(800, None), single_file=False)
             for image in images:
                 display(image)
-            # Create annotated file
-            highlighter = Factory.create("pdf")
-            highlighter.highlight(path_raw, path_highlighted, highlights)
 
             html_pdf = get_html_pdf(path_highlighted)
 
