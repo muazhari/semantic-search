@@ -22,6 +22,9 @@ import base64
 import uuid
 import os
 
+import tokenizers
+import sqlite3
+
 t0 = time.time()
 
 st.set_page_config(page_title="context-search")
@@ -49,13 +52,15 @@ def get_embeddings(model_name, data):
     return embeddings
 
 
-corpus = st.text_area('Enter a corpus.')
 corpus_source_type = st.radio(
     "What is corpus source type?", ('text', 'document', 'web'), index=0)
 
+if(corpus_source_type in ["text", "web"]):
+    corpus = st.text_area('Enter a corpus.')
+
 pdf_result = []  # [{"url": string, "file_name":numeric}]
 
-if (corpus_source_type == 'document'):
+if (corpus_source_type in ['document']):
     uploaded_file = st.file_uploader(
         "Upload a document", type=['pdf', 'doc', 'docx'])
     if uploaded_file is not None:
@@ -64,10 +69,10 @@ if (corpus_source_type == 'document'):
             f.write(uploaded_file.getbuffer())
 
         pdf_result.append({"url": None, "file_name": file_name})
-        st.success("File saved!")
+        st.success("File uploaded!")
 
 
-if (corpus_source_type == 'web'):
+if (corpus_source_type in ['web']):
     urls = [corpus]
 
     options = {
@@ -121,7 +126,7 @@ percentage = st.number_input(
     "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
 
 
-@st.cache()
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers: lambda x: None, sqlite3: lambda x: None})
 def get_granularized_corpus(corpus, granularity, window_sizes):
     granularized_corpus = []  # [string, ...]
     granularized_corpus_windowed = {}  # {"window_size": [(string,...), ...]}
@@ -165,10 +170,12 @@ granularized_corpus = get_granularized_corpus(
 
 # result = {"id": string, "text": string, "score": numeric}
 
+@st.cache()
 def retrieval_search(queries, embeddings, limit):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit=limit)]
 
 
+@st.cache()
 def rerank_search(queries, embeddings, similarity, limit):
     results = [result['text']
                for result in retrieval_search(queries, embeddings, limit)]
