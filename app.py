@@ -56,7 +56,7 @@ corpus_source_type = st.radio(
     "What is corpus source type?", ('text', 'document', 'web'), index=0)
 
 
-pdf_result = {}  # {"url": string, "file_name":numeric}
+pdf_result = None  # {"url": string, "file_name":numeric}
 
 if(corpus_source_type in ["text", "web"]):
     corpus = st.text_area('Enter a corpus.')
@@ -266,6 +266,7 @@ if(None not in [percentage, granularized_corpus, search_result, granularity]):
         percentage, granularized_corpus, search_result, granularity)
 
 
+@st.cache(allow_output_mutation=True)
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
