@@ -10,5 +10,6 @@ pyvirtualdisplay
 sentence_transformers
 spacy
 streamlit
-txtai
+txtai[all]
 txtmarker
+faiss-gpu
