@@ -44,7 +44,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def get_embeddings(model_name, data):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True})
@@ -126,6 +126,7 @@ percentage = st.number_input(
     "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
 
 
+@st.cache
 def get_granularized_corpus(corpus, granularity, window_sizes):
     granularized_corpus = []  # [string, ...]
     granularized_corpus_windowed = {}  # {"window_size": [(string,...), ...]}
@@ -163,25 +164,25 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
     return {"raw": granularized_corpus, "windowed": granularized_corpus_windowed, "windowed_indexed": granularized_corpus_windowed_indexed}
 
 
-if(None not in [corpus, granularity, window_sizes]):
+if(None not in [corpus, granularity, window_sizes] and corpus != ""):
     granularized_corpus = get_granularized_corpus(
         corpus, granularity, window_sizes)
 
 
 # result = {"id": string, "text": string, "score": numeric}
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def retrieval_search(queries, embeddings, limit):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit=limit)]
 
 
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def rerank_search(queries, embeddings, similarity, limit):
     results = [result['text']
                for result in retrieval_search(queries, embeddings, limit)]
     return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
 
 
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def search(model_name, query, window_sizes, granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
