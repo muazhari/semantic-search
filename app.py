@@ -142,7 +142,7 @@ def rerank_search(queries, embeddings, similarity, limit):
     return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: None})
 def search(model_name, query, window_sizes, granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
