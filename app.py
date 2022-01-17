@@ -101,24 +101,23 @@ pdf_splitted_page_file = None
 
 if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
     pdf_file = pdf_result['file_name']
-    pdf_splitted_page_file = pdf_file
-    # file_name = os.path.splitext(pdf_file)[0]
-    # pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
-    # pdf_writer = PdfFileWriter()
+    file_name = os.path.splitext(pdf_file)[0]
+    pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
+    pdf_writer = PdfFileWriter()
 
-    # pdf_max_page = pdf_reader.getNumPages()
+    pdf_max_page = pdf_reader.getNumPages()
 
-    # start_page = st.number_input(
-    #     f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
-    # end_page = st.number_input(
-    #     f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+    start_page = st.number_input(
+        f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+    end_page = st.number_input(
+        f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-    # for page_num in range(start_page - 1, end_page):
-    #     pdf_writer.addPage(pdf_reader.getPage(page_num))
+    for page_num in range(start_page - 1, end_page):
+        pdf_writer.addPage(pdf_reader.getPage(page_num))
 
-    # pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
-    # with open(pdf_splitted_page_file, 'wb') as out:
-    #     pdf_writer.write(out)
+    pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
+    with open(pdf_splitted_page_file, 'wb') as out:
+        pdf_writer.write(out)
 
     textractor = Textractor()
     corpus = textractor(pdf_splitted_page_file)
@@ -285,6 +284,7 @@ def get_html_pdf(file):
     return pdf_display
 
 
+html_pdf = None
 if(None not in [filtered_search_result, granularized_corpus]):
     if(None not in [pdf_splitted_page_file]):
         if(corpus_source_type in ["document", "web"]):
@@ -300,6 +300,8 @@ if(None not in [filtered_search_result, granularized_corpus]):
                 highlight = (name, text)
                 highlights.append(highlight)
 
+            print(len(highlights))
+            print(highlights)
             # Create annotated file
             highlighter = Factory.create("pdf")
             highlighter.highlight(path_raw, path_highlighted, highlights)
