@@ -74,7 +74,7 @@ if (corpus_source_type in ['document']):
 
 
 if (corpus_source_type in ['web']):
-    urls = [corpus]
+    url = corpus
 
     options = {
         'page-size': 'Letter',
@@ -85,36 +85,36 @@ if (corpus_source_type in ['web']):
     }
 
     with Display():
-        for url in urls:
-            file_name = "{}.pdf".format(str(uuid.uuid4()))
-            file_path = file_name
-            pdfkit.from_url(url, file_path, options=options)
-            new_pdf = {"url": url, "file_name": file_name}
-            pdf_result = new_pdf
+        file_name = "{}.pdf".format(str(uuid.uuid4()))
+        file_path = file_name
+        pdfkit.from_url(url, file_path, options=options)
+        new_pdf = {"url": url, "file_name": file_name}
+        pdf_result = new_pdf
 
 
 if (corpus_source_type in ['document', 'web'] and len(pdf_result) > 0):
     pdf_file = pdf_result['file_name']
     file_name = os.path.splitext(pdf_file)[0]
-    pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
-    pdf_writer = PdfFileWriter()
+    pdf_splitted_page_file = pdf_file
+    # pdf_reader = PdfFileReader(open(pdf_file, 'rb'))
+    # pdf_writer = PdfFileWriter()
 
-    pdf_max_page = pdf_reader.getNumPages()
+    # pdf_max_page = pdf_reader.getNumPages()
 
-    start_page = st.number_input(
-        f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
-    end_page = st.number_input(
-        f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+    # start_page = st.number_input(
+    #     f"Enter the start page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
+    # end_page = st.number_input(
+    #     f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-    for page_num in range(start_page - 1, end_page):
-        pdf_writer.addPage(pdf_reader.getPage(page_num))
+    # for page_num in range(start_page - 1, end_page):
+    #     pdf_writer.addPage(pdf_reader.getPage(page_num))
 
-    pdf_splitted_page_filename = f'{file_name}_{start_page}_page_{end_page}.pdf'
-    with open(pdf_splitted_page_filename, 'wb') as out:
-        pdf_writer.write(out)
+    # pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
+    # with open(pdf_splitted_page_file, 'wb') as out:
+    #     pdf_writer.write(out)
 
-    textractor = Textractor()
-    corpus = textractor(pdf_splitted_page_filename)
+    # textractor = Textractor()
+    # corpus = textractor(pdf_splitted_page_file)
 
 
 query = st.text_area('Enter a query.')
@@ -260,6 +260,7 @@ filtered_search_result = get_filtered_search_result(
     percentage, granularized_corpus, search_result, granularity)
 
 
+@st.cache(allow_output_mutation=True)
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
@@ -272,8 +273,8 @@ def get_html_pdf(file):
 
 
 if(corpus_source_type in ["document", "web"]):
-    path_raw = pdf_splitted_page_filename
-    path_highlighted = "highlighted_{}".format(pdf_splitted_page_filename)
+    path_raw = pdf_splitted_page_file
+    path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
 
     highlights = []
     for val in filtered_search_result['dict_raw']:
