@@ -126,7 +126,6 @@ percentage = st.number_input(
     "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
 
 
-@st.cache
 def get_granularized_corpus(corpus, granularity, window_sizes):
     granularized_corpus = []  # [string, ...]
     granularized_corpus_windowed = {}  # {"window_size": [(string,...), ...]}
