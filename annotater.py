@@ -58,8 +58,6 @@ class Annotate():
         # Build regex pattern
         pattern = re.compile("|".join([f"({p})" for p in patterns]))
 
-        text = pattern.sub(" ", text)
-
         # Clean/transform text
         text = pattern.sub(" ", text)
 
