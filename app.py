@@ -15,6 +15,7 @@ from txtmarker.factory import Factory
 import re
 
 import pdfkit
+from pdfrw import PdfReader, PdfWriter
 from pyvirtualdisplay import Display
 import base64
 
