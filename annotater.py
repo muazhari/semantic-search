@@ -7,9 +7,9 @@ class Annotate():
     def __init__(self):
         super().__init__()
 
-    def annotate(self, search_result_dict_raw, granularized_corpus_raw, input_path, output_path):
+    def annotate(self, search_result_raw, granularized_corpus_raw, input_path, output_path):
         highlights = []
-        for val in search_result_dict_raw:
+        for val in search_result_raw:
             name = "{:.4f}".format(val['score'])
             corpus_id = val['corpus_id']
             text = granularized_corpus_raw[corpus_id]
