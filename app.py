@@ -92,7 +92,7 @@ if (corpus_source_type in ['web']):
         'margin-left': '1.00in',
     }
 
-    if None not in [url]:
+    if None not in [url] and len(url) > 0:
         with Display():
             file_name = "{}.pdf".format(str(uuid.uuid4()))
             file_path = file_name
