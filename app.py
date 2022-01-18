@@ -25,6 +25,8 @@ import os
 import tokenizers
 import sqlite3
 
+from .annotater import Annotater
+
 t0 = time.time()
 
 st.set_page_config(page_title="context-search")
@@ -291,21 +293,8 @@ if(None not in [filtered_search_result, granularized_corpus]):
             path_raw = pdf_splitted_page_file
             path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
 
-            highlights = []
-            for val in filtered_search_result['dict_raw']:
-                name = "{:.4f}".format(val['score'])
-                corpus_id = val['corpus_id']
-                corpus_text = granularized_corpus["raw"][corpus_id]
-                text = re.escape(corpus_text)
-                highlight = (name, text)
-                highlights.append(highlight)
-
-            print([path_raw, path_highlighted, pdf_splitted_page_file])
-            print(len(highlights))
-            print(highlights)
-            # Create annotated file
-            highlighter = Factory.create("pdf")
-            highlighter.highlight(path_raw, path_highlighted, highlights)
+            Annotater.annotate(
+                filtered_search_result['dict_raw'], granularized_corpus["raw"], path_raw, path_highlighted)
 
             html_pdf = get_html_pdf(path_highlighted)
 
