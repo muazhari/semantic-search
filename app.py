@@ -64,7 +64,7 @@ corpus_source_type = st.radio(
     "What is corpus source type?", ('text', 'document', 'web'), index=0)
 
 
-pdf_result = None  # {"url": string, "file_name":numeric}
+pdf_file = None  # {"url": string, "file_name":numeric}
 
 if(corpus_source_type in ["text", "web"]):
     corpus = st.text_area('Enter a corpus.')
@@ -78,20 +78,19 @@ if (corpus_source_type in ['document']):
         with open(file_name, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        pdf_result = {"url": None, "file_name": file_name}
+        pdf_file = file_name
         st.success("File uploaded!")
 
 
 @st.cache
 def get_pdf_from_url(url):
-    pdf_result = None
+    pdf_file = None
     with Display():
         file_name = "{}.pdf".format(str(uuid.uuid4()))
         file_path = file_name
         pdfkit.from_url(url, file_path, options=options)
-        new_pdf = {"url": url, "file_name": file_name}
-        pdf_result = new_pdf
-    return pdf_result
+        pdf_file = file_name
+    return pdf_file
 
 
 if (corpus_source_type in ['web']):
@@ -106,7 +105,7 @@ if (corpus_source_type in ['web']):
     }
 
     if None not in [url] and len(corpus) > 0:
-        pdf_result = get_pdf_from_url(url)
+        pdf_file = get_pdf_from_url(url)
 
 
 pdf_splitted_page_file = None
@@ -124,9 +123,8 @@ def get_pdf_splitted_page_file(file_path):
     return file_path
 
 
-if(None not in [pdf_result]):
+if(None not in [pdf_file]):
     if (corpus_source_type in ['document', 'web']):
-        pdf_file = pdf_result['file_name']
         file_name = os.path.splitext(pdf_file)[0]
         pdf_reader = PdfReader(pdf_file)
         pdf_max_page = len(pdf_reader.pages)
