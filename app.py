@@ -283,9 +283,9 @@ if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
 
 @st.cache
 def get_filtered_search_result(percentage, shaped_corpus, search_result, granularity):
-    html_raw = shaped_corpus["raw"][:]
+    html_raw = shaped_corpus["granularized"][:]
     dict_raw = []
-    top_k = int(np.ceil(len(shaped_corpus["raw"])*percentage))
+    top_k = int(np.ceil(len(shaped_corpus["granularized"])*percentage))
     score_mean = 0
     total_count = 0
     for key, val in sorted(search_result["final"].items(), key=lambda x: x[1]["score_mean"], reverse=True)[:top_k]:
