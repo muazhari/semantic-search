@@ -15,6 +15,7 @@ from txtmarker.factory import Factory
 import re
 
 import pdfkit
+import pdfrw
 from pdfrw import PdfReader, PdfWriter
 from pyvirtualdisplay import Display
 import base64
@@ -111,7 +112,7 @@ if (corpus_source_type in ['web']):
 pdf_splitted_page_file = None
 
 
-@st.cache
+@st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: None})
 def get_pdf_splitted_page_file(file_path):
     pdf_writer = PdfWriter(file_path)
 
