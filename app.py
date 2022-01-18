@@ -303,7 +303,7 @@ if(None not in [filtered_search_result, granularized_corpus]):
     t1 = time.time()
 
     st.subheader("Output process duration")
-    st.write("{} s".format(t1-t0))
+    st.write("{} seconds".format(t1-t0))
 
     st.subheader("Output score mean")
     st.caption(
