@@ -367,4 +367,4 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     st.subheader("Results of granularized corpus (segmentation/tokenization)")
     st.caption("This shows the representation that the webapp gets of the input corpus. Useful for debugging if you get strange output.")
-    st.write(granularized_corpus["raw"])
+    st.write(shaped_corpus["granularized"])
