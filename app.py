@@ -82,6 +82,18 @@ if (corpus_source_type in ['document']):
         st.success("File uploaded!")
 
 
+@st.cache
+def get_pdf_from_url(url):
+    pdf_result = None
+    with Display():
+        file_name = "{}.pdf".format(str(uuid.uuid4()))
+        file_path = file_name
+        pdfkit.from_url(url, file_path, options=options)
+        new_pdf = {"url": url, "file_name": file_name}
+        pdf_result = new_pdf
+    return pdf_result
+
+
 if (corpus_source_type in ['web']):
     url = corpus
 
@@ -94,14 +106,23 @@ if (corpus_source_type in ['web']):
     }
 
     if None not in [url] and len(corpus) > 0:
-        with Display():
-            file_name = "{}.pdf".format(str(uuid.uuid4()))
-            file_path = file_name
-            pdfkit.from_url(url, file_path, options=options)
-            new_pdf = {"url": url, "file_name": file_name}
-            pdf_result = new_pdf
+        pdf_result = get_pdf_from_url(url)
+
 
 pdf_splitted_page_file = None
+
+
+@st.cache
+def get_pdf_splitted_page_file(file_path):
+    pdf_writer = PdfWriter(file_path)
+
+    for page_num in range(start_page - 1, end_page):
+        pdf_writer.addpage(pdf_reader.pages[page_num])
+
+    pdf_writer.write()
+
+    return file_path
+
 
 if(None not in [pdf_result]):
     if (corpus_source_type in ['document', 'web']):
@@ -115,16 +136,8 @@ if(None not in [pdf_result]):
         end_page = st.number_input(
             f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-        pdf_splitted_page_file = f'{file_name}_{start_page}_page_{end_page}.pdf'
-        pdf_writer = PdfWriter(pdf_splitted_page_file)
-
-        for page_num in range(start_page - 1, end_page):
-            pdf_writer.addpage(pdf_reader.pages[page_num])
-
-        pdf_writer.write()
-
-        textractor = Textractor()
-        corpus = textractor(pdf_splitted_page_file)
+        pdf_splitted_page_file = get_pdf_splitted_page_file(
+            f'{file_name}_{start_page}_page_{end_page}.pdf')
 
 
 query = st.text_area('Enter a query.')
@@ -138,25 +151,58 @@ percentage = st.number_input(
 
 
 @st.cache
-def get_granularized_corpus(corpus, granularity, window_sizes):
+def get_shaped_corpus(corpus, corpus_source_type, granularity, pdf_splitted_page_file=None):
+    raw_corpus = ""  # string
     granularized_corpus = []  # [string, ...]
+
+    if(corpus_source_type in ["text"]):
+        raw_corpus = corpus
+        if granularity == "word":
+            granularized_corpus += corpus.split(" ")
+        elif granularity == "sentence":
+            segmentation = Segmentation(sentences=True)
+            granularized_corpus = segmentation(corpus)
+        elif granularity == "paragraph":
+            segmentation = Segmentation(paragraphs=True)
+            granularized_corpus = segmentation(corpus)
+    elif(corpus_source_type in ["document", "web"]):
+        if granularity == "word":
+            textractor = Textractor()
+            raw_corpus = textractor(pdf_splitted_page_file)
+            granularized_corpus += corpus.split(" ")
+        elif granularity == "sentence":
+            textractor = Textractor(sentences=True)
+            granularized_corpus = textractor(pdf_splitted_page_file)
+            raw_corpus = " ".join(granularized_corpus)
+        elif granularity == "paragraph":
+            textractor = Textractor(paragraphs=True)
+            granularized_corpus = textractor(pdf_splitted_page_file)
+            raw_corpus = "\n".join(granularized_corpus)
+
+    return {"raw": raw_corpus, "granularized": granularized_corpus}
+
+
+shaped_corpus = None
+if(None not in [corpus, corpus_source_type, granularity] and len(corpus) > 0):
+    if(corpus_source_type in ["text"]):
+        shaped_corpus = get_shaped_corpus(
+            corpus, corpus_source_type, granularity)
+    elif(corpus_source_type in ["document", "web"]):
+        if(None not in [pdf_splitted_page_file]):
+            shaped_corpus = get_shaped_corpus(
+                corpus, corpus_source_type, granularity, pdf_splitted_page_file)
+
+
+@st.cache
+def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
     granularized_corpus_windowed = {}  # {"window_size": [(string,...), ...]}
     # {window_size: [({"corpus": string, "index": numeric}, ...), ...]}
     granularized_corpus_windowed_indexed = {}
 
-    if granularity == "word":
-        granularized_corpus += corpus.split(" ")
-    elif granularity == "sentence":
-        segmentation = Segmentation(sentences=True)
-        granularized_corpus = segmentation(corpus)
-    elif granularity == "paragraph":
-        segmentation = Segmentation(paragraphs=True)
-        granularized_corpus = segmentation(corpus)
-
     for window_size in window_sizes:
         granularized_corpus_windowed[window_size] = []
         granularized_corpus_windowed_indexed[window_size] = []
-        for wgc in more_itertools.windowed(enumerate(granularized_corpus), window_size):
+        for wgc in more_itertools.windowed(enumerate(shaped_corpus['granularized']), window_size):
             source_index = []
             windowed_corpus = []
             for index, item in wgc:
@@ -172,13 +218,13 @@ def get_granularized_corpus(corpus, granularity, window_sizes):
             granularized_corpus_windowed_indexed[window_size].append(
                 source_index)
 
-    return {"raw": granularized_corpus, "windowed": granularized_corpus_windowed, "windowed_indexed": granularized_corpus_windowed_indexed}
+    return {"windowed": granularized_corpus_windowed, "windowed_indexed": granularized_corpus_windowed_indexed}
 
 
-granularized_corpus = None
-if(None not in [corpus, granularity, window_sizes] and corpus != ""):
-    granularized_corpus = get_granularized_corpus(
-        corpus, granularity, window_sizes)
+windowed_granularized_corpus = None
+if(None not in [shaped_corpus, granularity, window_sizes]):
+    windowed_granularized_corpus = get_windowed_granularized_corpus(
+        shaped_corpus, granularity, window_sizes)
 
 
 # result = {"id": string, "text": string, "score": numeric}
