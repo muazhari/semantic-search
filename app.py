@@ -93,7 +93,7 @@ if (corpus_source_type in ['web']):
         'margin-left': '1.00in',
     }
 
-    if None not in [url] and len(url) > 0:
+    if None not in [url] and len(corpus) > 0:
         with Display():
             file_name = "{}.pdf".format(str(uuid.uuid4()))
             file_path = file_name
@@ -295,7 +295,7 @@ if(None not in [filtered_search_result, granularized_corpus]):
             path_raw = pdf_splitted_page_file
             path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
 
-            Annotate.annotate(
+            Annotate().annotate(
                 filtered_search_result['dict_raw'], granularized_corpus["raw"], path_raw, path_highlighted)
 
             html_pdf = get_html_pdf(path_highlighted)
