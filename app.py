@@ -216,7 +216,7 @@ def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
             granularized_corpus_windowed_indexed[window_size].append(
                 source_index)
 
-    return {"windowed": granularized_corpus_windowed, "windowed_indexed": granularized_corpus_windowed_indexed}
+    return {"raw": granularized_corpus_windowed, "indexed": granularized_corpus_windowed_indexed}
 
 
 windowed_granularized_corpus = None
@@ -239,15 +239,15 @@ def rerank_search(queries, embeddings, similarity, limit):
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
-def search(model_name, query, window_sizes, granularized_corpus):
+def search(model_name, query, window_sizes, windowed_granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     for window_size in window_sizes:
-        corpus_len = len(granularized_corpus["windowed"][window_size])
+        corpus_len = len(windowed_granularized_corpus["raw"][window_size])
 
         corpus_embeddings = get_embeddings(
-            model_name, granularized_corpus["windowed"][window_size])
+            model_name, windowed_granularized_corpus["raw"][window_size])
 
         # similarity = Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
         # semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
@@ -257,7 +257,7 @@ def search(model_name, query, window_sizes, granularized_corpus):
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
-            for source_corpus_index in granularized_corpus["windowed_indexed"][window_size][ssr["corpus_id"]]:
+            for source_corpus_index in windowed_granularized_corpus["indexed"][window_size][ssr["corpus_id"]]:
                 if(final_semantic_search_result.get(source_corpus_index, None) is None):
                     final_semantic_search_result[source_corpus_index] = {
                         "count": 1, "score_mean": ssr["score"]}
@@ -275,16 +275,16 @@ def search(model_name, query, window_sizes, granularized_corpus):
 
 
 search_result = None
-if(None not in [model_name, query, window_sizes, granularized_corpus]):
+if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
     search_result = search(
-        model_name, query, window_sizes, granularized_corpus)
+        model_name, query, window_sizes, windowed_granularized_corpus)
 
 
 @st.cache
-def get_filtered_search_result(percentage, granularized_corpus, search_result, granularity):
-    html_raw = granularized_corpus["raw"][:]
+def get_filtered_search_result(percentage, shaped_corpus, search_result, granularity):
+    html_raw = shaped_corpus["raw"][:]
     dict_raw = []
-    top_k = int(np.ceil(len(granularized_corpus["raw"])*percentage))
+    top_k = int(np.ceil(len(shaped_corpus["raw"])*percentage))
     score_mean = 0
     total_count = 0
     for key, val in sorted(search_result["final"].items(), key=lambda x: x[1]["score_mean"], reverse=True)[:top_k]:
@@ -315,9 +315,9 @@ def get_filtered_search_result(percentage, granularized_corpus, search_result, g
 
 
 filtered_search_result = None
-if(None not in [percentage, granularized_corpus, search_result, granularity]):
+if(None not in [percentage, shaped_corpus, search_result, granularity]):
     filtered_search_result = get_filtered_search_result(
-        percentage, granularized_corpus, search_result, granularity)
+        percentage, shaped_corpus, search_result, granularity)
 
 
 @st.cache(allow_output_mutation=True)
@@ -333,14 +333,14 @@ def get_html_pdf(file):
 
 
 html_pdf = None
-if(None not in [filtered_search_result, granularized_corpus]):
+if(None not in [filtered_search_result, shaped_corpus]):
     if(None not in [pdf_splitted_page_file]):
         if(corpus_source_type in ["document", "web"]):
             path_raw = pdf_splitted_page_file
             path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
 
             Annotate().annotate(
-                filtered_search_result['dict_raw'], granularized_corpus["raw"], path_raw, path_highlighted)
+                filtered_search_result['dict_raw'], shaped_corpus["raw"], path_raw, path_highlighted)
 
             html_pdf = get_html_pdf(path_highlighted)
 
