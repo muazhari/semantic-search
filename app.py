@@ -16,7 +16,6 @@ import re
 
 import pdfkit
 from pyvirtualdisplay import Display
-from pdfrw import PdfReader, PdfWriter
 import base64
 
 import uuid
@@ -25,7 +24,7 @@ import os
 import tokenizers
 import sqlite3
 
-from .annotater import Annotater
+from annotater import Annotater
 
 t0 = time.time()
 
