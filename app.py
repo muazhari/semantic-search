@@ -24,7 +24,7 @@ import os
 import tokenizers
 import sqlite3
 
-from annotater import Annotater
+from annotater import Annotate
 
 t0 = time.time()
 
@@ -292,7 +292,7 @@ if(None not in [filtered_search_result, granularized_corpus]):
             path_raw = pdf_splitted_page_file
             path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
 
-            Annotater.annotate(
+            Annotate.annotate(
                 filtered_search_result['dict_raw'], granularized_corpus["raw"], path_raw, path_highlighted)
 
             html_pdf = get_html_pdf(path_highlighted)
