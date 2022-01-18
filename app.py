@@ -71,7 +71,8 @@ if(corpus_source_type in ["text", "web"]):
 if (corpus_source_type in ['document']):
     uploaded_file = st.file_uploader(
         "Upload a document", type=['pdf', 'doc', 'docx'], accept_multiple_files=False)
-    if uploaded_file is not None:
+
+    if None not in [uploaded_file]:
         file_name = "{}.pdf".format(str(uuid.uuid4()))
         with open(file_name, "wb") as f:
             f.write(uploaded_file.getbuffer())
@@ -91,12 +92,13 @@ if (corpus_source_type in ['web']):
         'margin-left': '1.00in',
     }
 
-    with Display():
-        file_name = "{}.pdf".format(str(uuid.uuid4()))
-        file_path = file_name
-        pdfkit.from_url(url, file_path, options=options)
-        new_pdf = {"url": url, "file_name": file_name}
-        pdf_result = new_pdf
+    if None not in [url]:
+        with Display():
+            file_name = "{}.pdf".format(str(uuid.uuid4()))
+            file_path = file_name
+            pdfkit.from_url(url, file_path, options=options)
+            new_pdf = {"url": url, "file_name": file_name}
+            pdf_result = new_pdf
 
 pdf_splitted_page_file = None
 
