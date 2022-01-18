@@ -83,7 +83,7 @@ if (corpus_source_type in ['document']):
         st.success("File uploaded!")
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
@@ -341,7 +341,7 @@ if(None not in [filtered_search_result, shaped_corpus]):
             path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
 
             Annotate().annotate(
-                filtered_search_result['dict_raw'], shaped_corpus["raw"], path_raw, path_highlighted)
+                filtered_search_result['dict_raw'], shaped_corpus["granularized"], path_raw, path_highlighted)
 
             html_pdf = get_html_pdf(path_highlighted)
 
