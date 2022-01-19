@@ -276,9 +276,9 @@ def search(model_name, query, window_sizes, windowed_granularized_corpus):
 
 
 search_result = None
-# if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
-search_result = search(
-    model_name, query, window_sizes, windowed_granularized_corpus)
+if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
+    search_result = search(
+        model_name, query, window_sizes, windowed_granularized_corpus)
 
 
 @st.cache
