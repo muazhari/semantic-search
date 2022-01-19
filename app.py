@@ -265,8 +265,6 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
         semantic_search_result[window_size] = retrieval_search(
             (query), corpus_embeddings, limit=corpus_len)
-        semantic_search_result[window_size] += [
-            {"corpus_id": id, "score": 0} for id in range(0, corpus_len)]
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
@@ -284,6 +282,20 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
                     new_score_mean = old_score_mean + \
                         ((new_value-old_score_mean)/new_count)
                     final_semantic_search_result[source_corpus_index]["score_mean"] = new_score_mean
+
+        # add-up zero-score result
+        windowed_granularized_corpus_ids = set(
+            [id for id in range(0, corpus_len)])
+        semantic_search_result_ids = set(
+            [result["corpus_id"] for result in semantic_search_result[window_size]])
+        zero_semantic_search_result_ids = list(
+            windowed_granularized_corpus_ids-semantic_search_result_ids)
+
+        for corpus_id in zero_semantic_search_result_ids:
+            for source_corpus_index in windowed_granularized_corpus["indexed"][window_size][corpus_id]:
+                if(final_semantic_search_result.get(source_corpus_index, None) is None):
+                    final_semantic_search_result[source_corpus_index] = {
+                        "count": 1, "score_mean": 0}
 
     return {"windowed": semantic_search_result, "aggregated": final_semantic_search_result}
 
