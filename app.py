@@ -92,7 +92,7 @@ if (corpus_source_type in ['document']):
         st.success("File uploaded!")
 
 
-# @st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True)
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
@@ -254,8 +254,8 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     for window_size in window_sizes:
-        corpus_len = len(
-            windowed_granularized_corpus["raw"][window_size]) * 999
+        # corpus_len = len(windowed_granularized_corpus["raw"][window_size])
+        corpus_len = 999
 
         corpus_embeddings = get_embeddings(
             model_name, windowed_granularized_corpus["raw"][window_size])
