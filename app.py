@@ -250,7 +250,8 @@ def rerank_search(queries, embeddings, similarity, limit):
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def semantic_search(model_name, query, window_sizes, windowed_granularized_corpus):
-    semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
+    # {window_size: [{"corpus_id": 0, "score": 0}]}
+    semantic_search_result = {}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     for window_size in window_sizes:
@@ -264,6 +265,8 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
         semantic_search_result[window_size] = retrieval_search(
             (query), corpus_embeddings, limit=corpus_len)
+        semantic_search_result[window_size] += [
+            {"corpus_id": id, "score": 0} for id in range(0, corpus_len)]
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
@@ -271,6 +274,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
                 if(final_semantic_search_result.get(source_corpus_index, None) is None):
                     final_semantic_search_result[source_corpus_index] = {
                         "count": 1, "score_mean": ssr["score"]}
+                    semantic_search_result[window_size] += []
                 else:
                     old_count = final_semantic_search_result[source_corpus_index]["count"]
                     new_count = old_count + 1
