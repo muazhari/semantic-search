@@ -236,8 +236,8 @@ if(None not in [shaped_corpus, granularity, window_sizes]):
 
 # result = {"id": string, "text": string, "score": numeric}
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
-def retrieval_search(queries, embeddings, data, limit=None):
-    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.similarity(queries, limit)]
+def retrieval_search(queries, embeddings, data=None, limit=None):
+    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.similarity(queries, limit=limit)]
     # return [{"corpus_id": id, "score": score} for id, score in embeddings.similarity(queries, data)]
 
 
@@ -263,7 +263,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         # semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
 
         semantic_search_result[window_size] = retrieval_search(
-            (query), corpus_embeddings, windowed_granularized_corpus["raw"][window_size], corpus_len)
+            (query), corpus_embeddings, corpus_len)
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
