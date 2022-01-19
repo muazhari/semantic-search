@@ -194,9 +194,9 @@ if(None not in [corpus, corpus_source_type, granularity] and len(corpus) > 0):
 
 @st.cache
 def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
-    granularized_corpus_windowed = {}  # {"window_size": [(string,...), ...]}
+    windowed_granularized_corpus = {}  # {"window_size": [(string,...), ...]}
     # {window_size: [({"corpus": string, "index": numeric}, ...), ...]}
-    granularized_corpus_windowed_indexed = {}
+    indexed_windowed_granularized_corpus = {}
 
     for window_size in window_sizes:
         granularized_corpus_windowed[window_size] = []
@@ -213,11 +213,11 @@ def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
             elif(granularity == 'paragraph'):
                 windowed_corpus = "\n".join(windowed_corpus)
 
-            granularized_corpus_windowed[window_size].append(windowed_corpus)
-            granularized_corpus_windowed_indexed[window_size].append(
+            windowed_granularized_corpus[window_size].append(windowed_corpus)
+            indexed_windowed_granularized_corpus[window_size].append(
                 source_index)
 
-    return {"raw": granularized_corpus_windowed, "indexed": granularized_corpus_windowed_indexed}
+    return {"raw": windowed_granularized_corpus, "indexed": indexed_windowed_granularized_corpus}
 
 
 windowed_granularized_corpus = None
@@ -280,7 +280,7 @@ if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
     search_result = search(
         model_name, query, window_sizes, windowed_granularized_corpus)
 
-
+@st.cache
 def get_filtered_search_result(percentage, shaped_corpus, search_result, granularity):
     html_raw = shaped_corpus["granularized"][:]
     dict_raw = []
@@ -320,6 +320,7 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
         percentage, shaped_corpus, search_result, granularity)
 
 
+@st.cache
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
