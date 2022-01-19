@@ -61,7 +61,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def get_embeddings(model_name, method):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True, "method": method})
