@@ -28,10 +28,12 @@ import sqlite3
 
 from annotater import Annotate
 
-st.set_page_config(page_title="context-search")
+st.set_page_config(page_title="context-search", )
 
 is_git_sync_button_clicked = st.button("Git repository remote sync")
 if(is_git_sync_button_clicked):
+    current_directory = os.getcwd()
+    os.chdir(current_directory)
     os.system('git fetch --all')
     os.system('git reset --hard origin')
 
