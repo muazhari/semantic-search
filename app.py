@@ -239,7 +239,7 @@ def rerank_search(queries, embeddings, similarity, limit):
     return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def search(model_name, query, window_sizes, windowed_granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
@@ -272,7 +272,7 @@ def search(model_name, query, window_sizes, windowed_granularized_corpus):
                         ((new_value-old_score_mean)/new_count)
                     final_semantic_search_result[source_corpus_index]["score_mean"] = new_score_mean
 
-    return {"raw": semantic_search_result, "final": final_semantic_search_result}
+    return {"windowed": semantic_search_result, "aggregated": final_semantic_search_result}
 
 
 search_result = None
@@ -288,7 +288,7 @@ def get_filtered_search_result(percentage, shaped_corpus, search_result, granula
     top_k = int(np.ceil(len(shaped_corpus["granularized"])*percentage))
     score_mean = 0
     total_count = 0
-    for key, val in sorted(search_result["final"].items(), key=lambda x: x[1]["score_mean"], reverse=True)[:top_k]:
+    for key, val in sorted(search_result["aggregated"].items(), key=lambda x: x[1]["score_mean"], reverse=True)[:top_k]:
         old_count = total_count
         new_count = old_count + 1
         total_count = new_count
@@ -321,7 +321,7 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
         percentage, shaped_corpus, search_result, granularity)
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
@@ -363,7 +363,7 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     st.subheader("Raw semantic search results")
     st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus.")
-    st.write(search_result["final"])
+    st.write(search_result["aggregated"])
     st.write(filtered_search_result["dict_raw"])
 
     st.subheader("Results of granularized corpus (segmentation/tokenization)")
