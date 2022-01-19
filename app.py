@@ -28,9 +28,14 @@ import sqlite3
 
 from annotater import Annotate
 
-t0 = time.time()
 
-st.set_page_config(page_title="context-search")
+is_git_sync_button_clicked = st.button("Git repository remote sync")
+if(is_git_sync_button_clicked):
+    os.system('git fetch --all')
+    os.system('git reset --hard origin')
+
+
+t0 = time.time()
 
 
 @st.cache
@@ -39,6 +44,10 @@ def load_nltk():
 
 
 load_nltk()
+
+
+st.set_page_config(page_title="context-search")
+
 
 model_name = st.text_area(
     "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.",
@@ -255,6 +264,8 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
         semantic_search_result[window_size] = retrieval_search(
             (query), corpus_embeddings, corpus_len)
+
+        print(semantic_search_result[window_size])
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
