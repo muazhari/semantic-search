@@ -199,8 +199,8 @@ def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
     indexed_windowed_granularized_corpus = {}
 
     for window_size in window_sizes:
-        granularized_corpus_windowed[window_size] = []
-        granularized_corpus_windowed_indexed[window_size] = []
+        windowed_granularized_corpus[window_size] = []
+        indexed_windowed_granularized_corpus[window_size] = []
         for wgc in more_itertools.windowed(enumerate(shaped_corpus['granularized']), window_size):
             source_index = []
             windowed_corpus = []
@@ -364,8 +364,7 @@ if(None not in [filtered_search_result, shaped_corpus]):
     st.subheader("Raw semantic search results")
     st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus.")
     st.write(filtered_search_result["dict_raw"])
-    st.write([{"corpus_id": key, "score": val["score_mean"]}
-             for key, val in search_result["final"].items()])
+    st.write(search_result["final"])
 
     st.subheader("Results of granularized corpus (segmentation/tokenization)")
     st.caption("This shows the representation that the webapp gets of the input corpus. Useful for debugging if you get strange output.")
