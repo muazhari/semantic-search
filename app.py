@@ -372,12 +372,12 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     st.subheader("Raw semantic search results")
     st.caption("The index of the word, sentence, or paragraph is 'corpus_id'. Mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus is 'score'.")
-    st.write(search_result["windowed"])
-    st.write(search_result["aggregated"])
+    # st.write(search_result["windowed"])
+    # st.write(search_result["aggregated"])
     st.write(filtered_search_result["dict_raw"])
 
     st.subheader("Results of granularized corpus (segmentation/tokenization)")
     st.caption("This shows the representation that the webapp gets of the input corpus. Useful for debugging if you get strange output.")
     st.write(shaped_corpus["granularized"])
-    st.write(windowed_granularized_corpus["raw"])
-    st.write(windowed_granularized_corpus["indexed"])
+    # st.write(windowed_granularized_corpus["raw"])
+    # st.write(windowed_granularized_corpus["indexed"])
