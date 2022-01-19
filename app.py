@@ -388,9 +388,9 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     st.line_chart(chart_df)
 
-    st.subheader("Output score mean")
+    st.subheader("Output score overview")
     st.caption(
-        "Metric to determine how sure the context of query is in the highlighted corpus.")
+        "Metric to determine how sure the context of query is in the highlighted corpus (score to search result in descending order).")
     st.write(filtered_search_result["score_mean"])
 
     st.subheader("Output content")
