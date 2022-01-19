@@ -254,10 +254,10 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     for window_size in window_sizes:
-        corpus_len = len(windowed_granularized_corpus["raw"][window_size]) * 2
+        corpus_len = len(windowed_granularized_corpus["raw"][window_size])
 
         corpus_embeddings = get_embeddings(
-            model_name, windowed_granularized_corpus["raw"][window_size])
+            model_name, enumerate(windowed_granularized_corpus["raw"][window_size]))
 
         # similarity = Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
         # semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
