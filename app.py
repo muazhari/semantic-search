@@ -92,7 +92,7 @@ if (corpus_source_type in ['document']):
         st.success("File uploaded!")
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
