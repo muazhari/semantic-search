@@ -28,6 +28,7 @@ import sqlite3
 
 from annotater import Annotate
 
+st.set_page_config(page_title="context-search")
 
 is_git_sync_button_clicked = st.button("Git repository remote sync")
 if(is_git_sync_button_clicked):
@@ -44,9 +45,6 @@ def load_nltk():
 
 
 load_nltk()
-
-
-st.set_page_config(page_title="context-search")
 
 
 model_name = st.text_area(
