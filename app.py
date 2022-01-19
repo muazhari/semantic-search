@@ -381,7 +381,8 @@ if(None not in [filtered_search_result, shaped_corpus]):
         "Metric to determine how sure the context of query is in the corpus.")
 
     chart_df = pd.DataFrame(
-        [result['score_mean'] for result in search_result["aggregated"]],
+        [result['score_mean'] for result in sorted(search_result["aggregated"].items(
+        ), key=lambda x: x[1]["score_mean"], reverse=True)],
         columns=['score']
     )
 
