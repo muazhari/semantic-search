@@ -203,7 +203,7 @@ if(None not in [corpus, corpus_source_type, granularity] and len(corpus) > 0):
 
 @st.cache
 def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
-    windowed_granularized_corpus = {}  # {"window_size": [(string,...), ...]}
+    windowed_granularized_corpus = {}  # {"window_size": [string, ...]}
     # {window_size: [({"corpus": string, "index": numeric}, ...), ...]}
     indexed_windowed_granularized_corpus = {}
 
@@ -264,6 +264,8 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
         semantic_search_result[window_size] = retrieval_search(
             (query), corpus_embeddings, corpus_len)
+
+        print([enumerate(windowed_granularized_corpus["raw"][window_size])])
 
         print(["semantic_search", window_size, corpus_len, len(semantic_search_result[window_size]),
               semantic_search_result[window_size]])
