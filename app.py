@@ -51,7 +51,7 @@ load_nltk()
 model_name = st.text_area(
     "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.",
     value="sentence-transformers/msmarco-distilbert-cos-v5")
-st.caption("This will download a new model, so it may take a while or even break if the model is too large.")
+st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
 st.caption("See the list of pre-trained models that are available here: https://www.sbert.net/docs/pretrained_models.html.")
 
 
@@ -165,18 +165,18 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity, pdf_splitted_page
     if(corpus_source_type in ["text"]):
         raw_corpus = corpus
         if granularity == "word":
-            granularized_corpus += corpus.split(" ")
+            granularized_corpus += raw_corpus.split(" ")
         elif granularity == "sentence":
             segmentation = Segmentation(sentences=True)
-            granularized_corpus = segmentation(corpus)
+            granularized_corpus = segmentation(raw_corpus)
         elif granularity == "paragraph":
             segmentation = Segmentation(paragraphs=True)
-            granularized_corpus = segmentation(corpus)
+            granularized_corpus = segmentation(raw_corpus)
     elif(corpus_source_type in ["document", "web"]):
         if granularity == "word":
             textractor = Textractor()
             raw_corpus = textractor(pdf_splitted_page_file)
-            granularized_corpus += corpus.split(" ")
+            granularized_corpus += raw_corpus.split(" ")
         elif granularity == "sentence":
             textractor = Textractor(sentences=True)
             granularized_corpus = textractor(pdf_splitted_page_file)
