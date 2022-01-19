@@ -62,10 +62,10 @@ def hash_tensor(x):
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
-def get_embeddings(model_name, data):
+def get_embeddings(model_name, method):
     embeddings = Embeddings(
-        {"path": model_name, "content": True, "objects": True})
-    embeddings.index([(id, text, None) for id, text in enumerate(data)])
+        {"path": model_name, "content": True, "objects": True, "method": method})
+    # embeddings.index([(id, text, None) for id, text in enumerate(data)])
     return embeddings
 
 
@@ -254,10 +254,10 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     for window_size in window_sizes:
-        corpus_len = len(windowed_granularized_corpus["raw"][window_size])
+        # corpus_len = len(windowed_granularized_corpus["raw"][window_size])
 
         corpus_embeddings = get_embeddings(
-            model_name, windowed_granularized_corpus["raw"][window_size])
+            model_name, windowed_granularized_corpus["raw"][window_size], "sentence-transformers")
 
         # similarity = Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
         # semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
