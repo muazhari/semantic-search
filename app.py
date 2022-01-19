@@ -276,9 +276,9 @@ def search(model_name, query, window_sizes, windowed_granularized_corpus):
 
 
 search_result = None
-if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
-    search_result = search(
-        model_name, query, window_sizes, windowed_granularized_corpus)
+# if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
+search_result = search(
+    model_name, query, window_sizes, windowed_granularized_corpus)
 
 
 @st.cache
@@ -362,7 +362,7 @@ if(None not in [filtered_search_result, shaped_corpus]):
         st.write(filtered_search_result["html_raw"], unsafe_allow_html=True)
 
     st.subheader("Raw semantic search results")
-    st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus.")
+    st.caption("The index of the word, sentence, or paragraph is 'corpus_id'. Mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus is 'score'.")
     st.write(search_result["windowed"])
     st.write(search_result["aggregated"])
     st.write(filtered_search_result["dict_raw"])
