@@ -41,7 +41,7 @@ if(is_git_sync_button_clicked):
 t0 = time.time()
 
 
-# @st.cache
+@st.cache
 def load_nltk():
     nltk.download('punkt')
 
@@ -62,7 +62,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def get_embeddings(model_name, data):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True})
@@ -92,7 +92,7 @@ if (corpus_source_type in ['document']):
         st.success("File uploaded!")
 
 
-# @st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True)
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
@@ -121,7 +121,7 @@ if (corpus_source_type in ['web']):
 pdf_splitted_page_file = None
 
 
-# @st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: None})
+@st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: None})
 def get_pdf_splitted_page_file(file_path):
     pdf_writer = PdfWriter(file_path)
 
@@ -158,7 +158,7 @@ percentage = st.number_input(
     "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
 
 
-# @st.cache
+@st.cache
 def get_shaped_corpus(corpus, corpus_source_type, granularity, pdf_splitted_page_file=None):
     raw_corpus = ""  # string
     granularized_corpus = []  # [string, ...]
@@ -201,7 +201,7 @@ if(None not in [corpus, corpus_source_type, granularity] and len(corpus) > 0):
                 corpus, corpus_source_type, granularity, pdf_splitted_page_file)
 
 
-# @st.cache
+@st.cache
 def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
     windowed_granularized_corpus = {}  # {"window_size": [(string,...), ...]}
     # {window_size: [({"corpus": string, "index": numeric}, ...), ...]}
@@ -236,25 +236,26 @@ if(None not in [shaped_corpus, granularity, window_sizes]):
 
 
 # result = {"id": string, "text": string, "score": numeric}
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def retrieval_search(queries, embeddings, limit):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit=limit)]
 
 
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def rerank_search(queries, embeddings, similarity, limit):
     results = [result['text']
                for result in retrieval_search(queries, embeddings, limit)]
     return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
 
 
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def semantic_search(model_name, query, window_sizes, windowed_granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     for window_size in window_sizes:
-        corpus_len = len(windowed_granularized_corpus["raw"][window_size])
+        corpus_len = len(
+            windowed_granularized_corpus["raw"][window_size]) * 999
 
         corpus_embeddings = get_embeddings(
             model_name, windowed_granularized_corpus["raw"][window_size])
@@ -293,7 +294,7 @@ if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
         model_name, query, window_sizes, windowed_granularized_corpus)
 
 
-# @st.cache
+@st.cache
 def get_filtered_search_result(percentage, shaped_corpus, search_result, granularity):
     html_raw = shaped_corpus["granularized"][:]
     dict_raw = []
@@ -333,7 +334,7 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
         percentage, shaped_corpus, search_result, granularity)
 
 
-# @st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True)
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
