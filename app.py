@@ -263,7 +263,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         # semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
 
         semantic_search_result[window_size] = retrieval_search(
-            (query), corpus_embeddings, corpus_len)
+            (query), corpus_embeddings, limit=corpus_len)
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
