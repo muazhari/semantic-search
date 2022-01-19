@@ -3,6 +3,7 @@ import re
 import streamlit as st
 import more_itertools
 import numpy as np
+import pandas as pd
 import time
 import io
 
@@ -252,7 +253,8 @@ def rerank_search(queries, embeddings, similarity, limit):
 def semantic_search(model_name, query, window_sizes, windowed_granularized_corpus):
     # {window_size: [{"corpus_id": 0, "score": 0}]}
     semantic_search_result = {}
-    final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
+    # {corpus_id: {"score_mean": 0, count: 0}}
+    final_semantic_search_result = {}
 
     for window_size in window_sizes:
         corpus_len = len(windowed_granularized_corpus["raw"][window_size])
@@ -373,6 +375,17 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     st.subheader("Output process duration")
     st.write("{} seconds".format(t1-t0))
+
+    st.subheader("Output score mean")
+    st.caption(
+        "Metric to determine how sure the context of query is in the corpus.")
+
+    chart_df = pd.DataFrame(
+        [result['score_mean'] for result in search_result["aggregated"]],
+        columns=['score']
+    )
+
+    st.line_chart(chart_df)
 
     st.subheader("Output score mean")
     st.caption(
