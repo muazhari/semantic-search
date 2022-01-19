@@ -239,7 +239,7 @@ def rerank_search(queries, embeddings, similarity, limit):
     return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
 
 
-# @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def search(model_name, query, window_sizes, windowed_granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
@@ -363,6 +363,7 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     st.subheader("Raw semantic search results")
     st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus.")
+    st.write(search_result["windowed"])
     st.write(search_result["aggregated"])
     st.write(filtered_search_result["dict_raw"])
 
