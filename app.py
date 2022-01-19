@@ -254,8 +254,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     for window_size in window_sizes:
-        # corpus_len = len(windowed_granularized_corpus["raw"][window_size])
-        corpus_len = 999
+        corpus_len = len(windowed_granularized_corpus["raw"][window_size])
 
         corpus_embeddings = get_embeddings(
             model_name, windowed_granularized_corpus["raw"][window_size])
