@@ -238,7 +238,7 @@ if(None not in [shaped_corpus, granularity, window_sizes]):
 # result = {"id": string, "text": string, "score": numeric}
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def retrieval_search(queries, embeddings, limit):
-    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit=limit)]
+    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.similarity(queries, limit=limit)]
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
