@@ -240,7 +240,7 @@ def rerank_search(queries, embeddings, similarity, limit):
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
-def search(model_name, query, window_sizes, windowed_granularized_corpus):
+def semantic_search(model_name, query, window_sizes, windowed_granularized_corpus):
     semantic_search_result = {}  # {window_size: {"corpus_id": 0, "score": 0}}
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
@@ -276,9 +276,9 @@ def search(model_name, query, window_sizes, windowed_granularized_corpus):
 
 
 search_result = None
-# if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
-search_result = search(
-    model_name, query, window_sizes, windowed_granularized_corpus)
+if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
+    search_result = semantic_search(
+        model_name, query, window_sizes, windowed_granularized_corpus)
 
 
 @st.cache
