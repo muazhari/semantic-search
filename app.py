@@ -32,11 +32,11 @@ st.set_page_config(page_title="context-search", )
 
 is_git_sync_button_clicked = st.button("Git repository remote sync")
 if(is_git_sync_button_clicked):
-    current_directory = "/content/context-search-ui"
-    os.chdir(current_directory)
+    os.chdir("/content/context-search-ui")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
     os.system('streamlit cache clear')
+    os.chdir("/content")
 
 
 t0 = time.time()
