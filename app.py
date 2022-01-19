@@ -41,7 +41,7 @@ if(is_git_sync_button_clicked):
 t0 = time.time()
 
 
-@st.cache
+# @st.cache
 def load_nltk():
     nltk.download('punkt')
 
@@ -92,7 +92,7 @@ if (corpus_source_type in ['document']):
         st.success("File uploaded!")
 
 
-@st.cache(allow_output_mutation=True)
+# @st.cache(allow_output_mutation=True)
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
@@ -121,7 +121,7 @@ if (corpus_source_type in ['web']):
 pdf_splitted_page_file = None
 
 
-@st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: None})
+# @st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: None})
 def get_pdf_splitted_page_file(file_path):
     pdf_writer = PdfWriter(file_path)
 
@@ -158,7 +158,7 @@ percentage = st.number_input(
     "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
 
 
-@st.cache
+# @st.cache
 def get_shaped_corpus(corpus, corpus_source_type, granularity, pdf_splitted_page_file=None):
     raw_corpus = ""  # string
     granularized_corpus = []  # [string, ...]
@@ -201,7 +201,7 @@ if(None not in [corpus, corpus_source_type, granularity] and len(corpus) > 0):
                 corpus, corpus_source_type, granularity, pdf_splitted_page_file)
 
 
-@st.cache
+# @st.cache
 def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
     windowed_granularized_corpus = {}  # {"window_size": [(string,...), ...]}
     # {window_size: [({"corpus": string, "index": numeric}, ...), ...]}
@@ -293,7 +293,7 @@ if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
         model_name, query, window_sizes, windowed_granularized_corpus)
 
 
-@st.cache
+# @st.cache
 def get_filtered_search_result(percentage, shaped_corpus, search_result, granularity):
     html_raw = shaped_corpus["granularized"][:]
     dict_raw = []
@@ -333,7 +333,7 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
         percentage, shaped_corpus, search_result, granularity)
 
 
-@st.cache(allow_output_mutation=True)
+# @st.cache(allow_output_mutation=True)
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
