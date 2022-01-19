@@ -281,7 +281,6 @@ if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
         model_name, query, window_sizes, windowed_granularized_corpus)
 
 
-@st.cache
 def get_filtered_search_result(percentage, shaped_corpus, search_result, granularity):
     html_raw = shaped_corpus["granularized"][:]
     dict_raw = []
