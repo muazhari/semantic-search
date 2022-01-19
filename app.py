@@ -376,10 +376,9 @@ if(None not in [filtered_search_result, shaped_corpus]):
     st.subheader("Output process duration")
     st.write("{} seconds".format(t1-t0))
 
-    st.subheader("Output score mean")
+    st.subheader("Output score overview")
     st.caption(
-        "Metric to determine how sure the context of query is in the corpus.")
-
+        "Metric to determine how sure the context of query is in the highlighted corpus (score to search result in descending order).")
     chart_df = pd.DataFrame(
         [result['score_mean'] for result in sorted(search_result["aggregated"].values(
         ), key=lambda x: x["score_mean"], reverse=True)],
@@ -388,9 +387,9 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     st.line_chart(chart_df)
 
-    st.subheader("Output score overview")
+    st.subheader("Output score mean")
     st.caption(
-        "Metric to determine how sure the context of query is in the highlighted corpus (score to search result in descending order).")
+        "Metric to determine how sure the context of query is in the highlighted corpus.")
     st.write(filtered_search_result["score_mean"])
 
     st.subheader("Output content")
