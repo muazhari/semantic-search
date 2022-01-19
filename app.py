@@ -280,6 +280,7 @@ if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
     search_result = search(
         model_name, query, window_sizes, windowed_granularized_corpus)
 
+
 @st.cache
 def get_filtered_search_result(percentage, shaped_corpus, search_result, granularity):
     html_raw = shaped_corpus["granularized"][:]
@@ -363,6 +364,8 @@ if(None not in [filtered_search_result, shaped_corpus]):
     st.subheader("Raw semantic search results")
     st.caption("corpus_id is the index of the word, sentence, or paragraph. score is mean of overlapped windowed corpus from raw scores by similarity scoring between the query and the corpus.")
     st.write(filtered_search_result["dict_raw"])
+    st.write([{"corpus_id": key, "score": val["score_mean"]}
+             for key, val in search_result["final"].items()])
 
     st.subheader("Results of granularized corpus (segmentation/tokenization)")
     st.caption("This shows the representation that the webapp gets of the input corpus. Useful for debugging if you get strange output.")
