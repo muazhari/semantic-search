@@ -238,7 +238,7 @@ if(None not in [shaped_corpus, granularity, window_sizes]):
 # result = {"id": string, "text": string, "score": numeric}
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def retrieval_search(queries, embeddings, limit):
-    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.similarity(queries)]
+    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit=limit)]
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
@@ -254,7 +254,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     final_semantic_search_result = {}  # {corpus_id: {"score_mean": 0, count: 0}}
 
     for window_size in window_sizes:
-        corpus_len = len(windowed_granularized_corpus["raw"][window_size])
+        corpus_len = len(windowed_granularized_corpus["raw"][window_size]) * 2
 
         corpus_embeddings = get_embeddings(
             model_name, windowed_granularized_corpus["raw"][window_size])
