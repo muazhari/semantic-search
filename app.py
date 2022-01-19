@@ -256,6 +256,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     for window_size in window_sizes:
         corpus_len = len(windowed_granularized_corpus["raw"][window_size])
 
+        print([enumerate(windowed_granularized_corpus["raw"][window_size])])
         corpus_embeddings = get_embeddings(
             model_name, enumerate(windowed_granularized_corpus["raw"][window_size]))
 
@@ -264,8 +265,6 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
         semantic_search_result[window_size] = retrieval_search(
             (query), corpus_embeddings, corpus_len)
-
-        print([enumerate(windowed_granularized_corpus["raw"][window_size])])
 
         print(["semantic_search", window_size, corpus_len, len(semantic_search_result[window_size]),
               semantic_search_result[window_size]])
