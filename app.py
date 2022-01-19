@@ -265,9 +265,6 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         semantic_search_result[window_size] = retrieval_search(
             (query), corpus_embeddings, windowed_granularized_corpus["raw"][window_size])
 
-        print(["semantic_search", window_size, corpus_len, len(semantic_search_result[window_size]),
-              semantic_search_result[window_size]])
-
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
             for source_corpus_index in windowed_granularized_corpus["indexed"][window_size][ssr["corpus_id"]]:
