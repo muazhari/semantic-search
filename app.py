@@ -35,8 +35,7 @@ if(is_git_sync_button_clicked):
     os.chdir("/content/context-search-ui")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
-    os.system('streamlit cache clear')
-    os.chdir("/content")
+    st.caching.clear_cache()
 
 
 t0 = time.time()
