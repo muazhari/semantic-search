@@ -1,7 +1,6 @@
 import torch
 import re
 import streamlit as st
-from streamlit import caching
 import more_itertools
 import numpy as np
 import time
@@ -36,7 +35,7 @@ if(is_git_sync_button_clicked):
     os.chdir("/content/context-search-ui")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
-    caching.clear_cache()
+    st.legacy_caching.clear_cache()
 
 
 t0 = time.time()
