@@ -36,6 +36,7 @@ if(is_git_sync_button_clicked):
     os.chdir(current_directory)
     os.system('git fetch --all')
     os.system('git reset --hard origin')
+    os.system('streamlit cache clear')
 
 
 t0 = time.time()
