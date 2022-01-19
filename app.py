@@ -382,7 +382,7 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     chart_df = pd.DataFrame(
         [result['score_mean'] for result in sorted(search_result["aggregated"].values(
-        ), key=lambda x: x[1]["score_mean"], reverse=True)],
+        ), key=lambda x: x["score_mean"], reverse=True)],
         columns=['score']
     )
 
