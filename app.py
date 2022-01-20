@@ -191,11 +191,16 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity, pdf_splitted_page
 
 
 shaped_corpus = None
-if(None not in [corpus, corpus_source_type, granularity]):
-    if(corpus_source_type in ["text"]):
-        shaped_corpus = get_shaped_corpus(
-            corpus, corpus_source_type, granularity)
-    elif(corpus_source_type in ["document", "web"]):
+if(None not in [corpus_source_type, granularity]):
+    if(None not in [corpus]):
+        if(corpus_source_type in ["text"]):
+            shaped_corpus = get_shaped_corpus(
+                corpus, corpus_source_type, granularity)
+        if(None not in [pdf_splitted_page_file]):
+            shaped_corpus = get_shaped_corpus(
+                corpus, corpus_source_type, granularity, pdf_splitted_page_file)
+
+    if(corpus_source_type in ["document"]):
         if(None not in [pdf_splitted_page_file]):
             shaped_corpus = get_shaped_corpus(
                 corpus, corpus_source_type, granularity, pdf_splitted_page_file)
