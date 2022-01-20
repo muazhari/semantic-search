@@ -114,7 +114,7 @@ if (corpus_source_type in ['web']):
         'margin-left': '1.00in',
     }
 
-    if None not in [url] and len(corpus) > 0:
+    if None not in [url] and corpus != "":
         pdf_file = get_pdf_from_url(url)
 
 
@@ -191,7 +191,7 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity, pdf_splitted_page
 
 
 shaped_corpus = None
-if(None not in [corpus, corpus_source_type, granularity] and len(corpus) > 0):
+if(None not in [corpus, corpus_source_type, granularity] and corpus != ""):
     if(corpus_source_type in ["text"]):
         shaped_corpus = get_shaped_corpus(
             corpus, corpus_source_type, granularity)
@@ -378,7 +378,7 @@ if(None not in [filtered_search_result, shaped_corpus]):
 
     st.subheader("Output score overview")
     st.caption(
-        "Metric to determine how sure the context of query is in the highlighted corpus (score to search result in descending order).")
+        "Metric to determine how sure the context of query is in the corpus (score to search result in descending order).")
     chart_df = pd.DataFrame(
         [result['score_mean'] for result in sorted(search_result["aggregated"].values(
         ), key=lambda x: x["score_mean"], reverse=True)],
