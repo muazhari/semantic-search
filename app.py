@@ -22,11 +22,19 @@ import base64
 
 import uuid
 import os
+import pathlib
 
 import tokenizers
 import sqlite3
 
 from annotater import Annotate
+
+
+STREAMLIT_STATIC_PATH = pathlib.Path(st.__path__[0]) / 'static'
+
+ASSETS_PATH = (STREAMLIT_STATIC_PATH / "assets")
+if not ASSETS_PATH.is_dir():
+    ASSETS_PATH.mkdir()
 
 st.set_page_config(page_title="context-search", )
 
@@ -89,7 +97,8 @@ if (corpus_source_type in ['document']):
         with open(file_name, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        pdf_file = file_name
+        file_path = (ASSETS_PATH / file_name)
+        pdf_file = file_path
         st.success("File uploaded!")
 
 
@@ -98,9 +107,9 @@ def get_pdf_from_url(url):
     pdf_file = None
     with Display():
         file_name = "{}.pdf".format(str(uuid.uuid4()))
-        file_path = file_name
+        file_path = (ASSETS_PATH / file_name)
         pdfkit.from_url(url, file_path, options=options)
-        pdf_file = file_name
+        pdf_file = file_path
     return pdf_file
 
 
@@ -140,8 +149,10 @@ if(None not in [pdf_file]):
         end_page = st.number_input(
             f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-        corpus = get_pdf_splitted_page_file(
+        splitted_file_name = get_pdf_splitted_page_file(
             f'{file_name}_{start_page}_page_{end_page}.pdf')
+        splitted_file_path = (ASSETS_PATH / splitted_file_name)
+        corpus = splitted_file_path
 
 
 query = st.text_area('Enter a query.')
@@ -339,13 +350,9 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
         percentage, shaped_corpus, search_result, granularity)
 
 
-def get_html_pdf(file):
-    # Opening file from file path
-    with open(file, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-
+def get_html_pdf(file_path):
     # Embedding PDF in HTML
-    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
+    pdf_display = F'<iframe src="{file_path}" width="700" height="1000" type="application/pdf"></iframe>'
 
     return pdf_display
 
@@ -353,8 +360,15 @@ def get_html_pdf(file):
 html_pdf = None
 if(None not in [corpus, filtered_search_result, shaped_corpus]):
     if(corpus_source_type in ["document", "web"]):
+
+        file_name = os.path.splitext(corpus)[0]
+
+        highlighted_file_name = get_pdf_splitted_page_file(
+            f'{file_name}_highlighted.pdf')
+        highlighted_file_path = (ASSETS_PATH / highlighted_file_name)
+
         path_raw = corpus
-        path_highlighted = "highlighted_{}".format(corpus)
+        path_highlighted = highlighted_file_path
 
         Annotate().annotate(
             filtered_search_result['dict_raw'], shaped_corpus["granularized"], path_raw, path_highlighted)
