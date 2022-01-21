@@ -354,7 +354,7 @@ def get_html_pdf(file_path):
     relative_path = "static/assets/{}".format(os.path.basename(file_path))
     print(relative_path)
     # Embedding PDF in HTML
-    pdf_display = F'<iframe src="{relative_path}" width="700" height="1000" type="application/pdf"></iframe>'
+    pdf_display = F'<iframe src="{relative_path}" width="700" height="1000"></iframe>'
 
     return pdf_display
 
