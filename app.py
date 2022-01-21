@@ -113,7 +113,7 @@ if (corpus_source_type in ['web']):
         'margin-left': '1.00in',
     }
 
-    if None not in [corpus]:
+    if (None not in [corpus] and corpus != ""):
         pdf_file = get_pdf_from_url(corpus)
 
 
