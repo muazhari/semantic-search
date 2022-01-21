@@ -342,10 +342,10 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
 def get_html_pdf(file):
     # Opening file from file path
     with open(file, "rb") as f:
-        a85_pdf = base64.a85encode(f.read()).decode('utf-8')
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
 
     # Embedding PDF in HTML
-    pdf_display = F'<iframe src="data:application/pdf;a85,{a85_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
+    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
 
     return pdf_display
 
