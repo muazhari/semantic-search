@@ -97,7 +97,7 @@ if (corpus_source_type in ['document']):
         with open(file_name, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        file_path = (ASSETS_PATH / file_name)
+        file_path = str(ASSETS_PATH / file_name)
         pdf_file = file_path
         st.success("File uploaded!")
 
@@ -107,7 +107,7 @@ def get_pdf_from_url(url):
     pdf_file = None
     with Display():
         file_name = "{}.pdf".format(str(uuid.uuid4()))
-        file_path = (ASSETS_PATH / file_name)
+        file_path = str(ASSETS_PATH / file_name)
         pdfkit.from_url(url, file_path, options=options)
         pdf_file = file_path
     return pdf_file
@@ -150,8 +150,8 @@ if(None not in [pdf_file]):
             f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
         splitted_file_name = get_pdf_splitted_page_file(
-            f'{file_name}_{start_page}_page_{end_page}.pdf')
-        splitted_file_path = (ASSETS_PATH / splitted_file_name)
+            f'{file_name}_split_{start_page}_to_{end_page}.pdf')
+        splitted_file_path = str(ASSETS_PATH / splitted_file_name)
         corpus = splitted_file_path
 
 
@@ -365,7 +365,7 @@ if(None not in [corpus, filtered_search_result, shaped_corpus]):
 
         highlighted_file_name = get_pdf_splitted_page_file(
             f'{file_name}_highlighted.pdf')
-        highlighted_file_path = (ASSETS_PATH / highlighted_file_name)
+        highlighted_file_path = str(ASSETS_PATH / highlighted_file_name)
 
         path_raw = corpus
         path_highlighted = highlighted_file_path
