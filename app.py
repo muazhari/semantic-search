@@ -30,7 +30,7 @@ import sqlite3
 from annotater import Annotate
 
 
-STREAMLIT_STATIC_PATH = pathlib.Path(st.__path__[0]) / 'static'
+STREAMLIT_STATIC_PATH = pathlib.Path(st.__path__[0]) / 'static' / 'static'
 
 ASSETS_PATH = (STREAMLIT_STATIC_PATH / "assets")
 if not ASSETS_PATH.is_dir():
@@ -352,6 +352,7 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
 
 def get_html_pdf(file_path):
     relative_path = "static/assets/{}".format(os.path.basename(file_path))
+    print(relative_path)
     # Embedding PDF in HTML
     pdf_display = F'<iframe src="{relative_path}" width="700" height="1000" type="application/pdf"></iframe>'
 
