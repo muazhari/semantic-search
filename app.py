@@ -351,7 +351,9 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
 
 
 def get_html_pdf(file_path):
-    relative_url_path = "static/assets/{}".format(os.path.basename(file_path))
+    base_file = os.path.basename(file_path)
+    file_name = os.path.splitext(base_file)[0]
+    relative_url_path = "static/assets/{}".format(file_name)
     # Embedding PDF in HTML
     pdf_display = F'<iframe src="{relative_url_path}" width="700" height="1000"></iframe>'
 
