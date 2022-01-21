@@ -193,9 +193,8 @@ if(None not in [corpus, corpus_source_type, granularity]):
         shaped_corpus = get_shaped_corpus(
             corpus, corpus_source_type, granularity)
     elif(corpus_source_type in ["document", "web"]):
-        if(None not in [corpus]):
-            shaped_corpus = get_shaped_corpus(
-                corpus, corpus_source_type, granularity)
+        shaped_corpus = get_shaped_corpus(
+            corpus, corpus_source_type, granularity)
 
 
 @st.cache
