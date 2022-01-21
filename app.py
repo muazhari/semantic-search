@@ -352,7 +352,7 @@ if(None not in [percentage, shaped_corpus, search_result, granularity]):
 
 def get_html_pdf(file_path):
     # Embedding PDF in HTML
-    pdf_display = F'<iframe src="{file_path}" width="700" height="1000" type="application/pdf"></iframe>'
+    pdf_display = F'<iframe src="{file_path}" width="700" height="1000"></iframe>'
 
     return pdf_display
 
