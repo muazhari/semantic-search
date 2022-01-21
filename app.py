@@ -360,11 +360,8 @@ def get_html_pdf(file_path):
 html_pdf = None
 if(None not in [corpus, filtered_search_result, shaped_corpus]):
     if(corpus_source_type in ["document", "web"]):
-
         file_name = os.path.splitext(corpus)[0]
-
-        highlighted_file_name = get_pdf_splitted_page_file(
-            f'{file_name}_highlighted.pdf')
+        highlighted_file_name = f'{file_name}_highlighted.pdf'
         highlighted_file_path = str(ASSETS_PATH / highlighted_file_name)
 
         path_raw = corpus
