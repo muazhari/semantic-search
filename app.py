@@ -118,9 +118,6 @@ if (corpus_source_type in ['web']):
         pdf_file = get_pdf_from_url(url)
 
 
-pdf_splitted_page_file = None
-
-
 @st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: None})
 def get_pdf_splitted_page_file(file_path):
     pdf_writer = PdfWriter(file_path)
@@ -144,7 +141,7 @@ if(None not in [pdf_file]):
         end_page = st.number_input(
             f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-        pdf_splitted_page_file = get_pdf_splitted_page_file(
+        corpus = get_pdf_splitted_page_file(
             f'{file_name}_{start_page}_page_{end_page}.pdf')
 
 
@@ -159,7 +156,7 @@ percentage = st.number_input(
 
 
 @st.cache
-def get_shaped_corpus(corpus, corpus_source_type, granularity, pdf_splitted_page_file=None):
+def get_shaped_corpus(corpus, corpus_source_type, granularity):
     raw_corpus = ""  # string
     granularized_corpus = []  # [string, ...]
 
@@ -176,34 +173,29 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity, pdf_splitted_page
     elif(corpus_source_type in ["document", "web"]):
         if granularity == "word":
             textractor = Textractor()
-            raw_corpus = textractor(pdf_splitted_page_file)
+            raw_corpus = textractor(corpus)
             granularized_corpus += raw_corpus.split(" ")
         elif granularity == "sentence":
             textractor = Textractor(sentences=True)
-            granularized_corpus = textractor(pdf_splitted_page_file)
+            granularized_corpus = textractor(corpus)
             raw_corpus = " ".join(granularized_corpus)
         elif granularity == "paragraph":
             textractor = Textractor(paragraphs=True)
-            granularized_corpus = textractor(pdf_splitted_page_file)
+            granularized_corpus = textractor(corpus)
             raw_corpus = "\n".join(granularized_corpus)
 
     return {"raw": raw_corpus, "granularized": granularized_corpus}
 
 
 shaped_corpus = None
-if(None not in [corpus_source_type, granularity]):
-    if(None not in [corpus]):
-        if(corpus_source_type in ["text"]):
+if(None not in [corpus, corpus_source_type, granularity]):
+    if(corpus_source_type in ["text"]):
+        shaped_corpus = get_shaped_corpus(
+            corpus, corpus_source_type, granularity)
+    elif(corpus_source_type in ["document", "web"]):
+        if(None not in [corpus]):
             shaped_corpus = get_shaped_corpus(
                 corpus, corpus_source_type, granularity)
-        if(None not in [pdf_splitted_page_file]):
-            shaped_corpus = get_shaped_corpus(
-                corpus, corpus_source_type, granularity, pdf_splitted_page_file)
-
-    if(corpus_source_type in ["document"]):
-        if(None not in [pdf_splitted_page_file]):
-            shaped_corpus = get_shaped_corpus(
-                corpus, corpus_source_type, granularity, pdf_splitted_page_file)
 
 
 @st.cache
@@ -365,16 +357,15 @@ def get_html_pdf(file):
 
 
 html_pdf = None
-if(None not in [filtered_search_result, shaped_corpus]):
-    if(None not in [pdf_splitted_page_file]):
-        if(corpus_source_type in ["document", "web"]):
-            path_raw = pdf_splitted_page_file
-            path_highlighted = "highlighted_{}".format(pdf_splitted_page_file)
+if(None not in [corpus, filtered_search_result, shaped_corpus]):
+    if(corpus_source_type in ["document", "web"]):
+        path_raw = corpus
+        path_highlighted = "highlighted_{}".format(corpus)
 
-            Annotate().annotate(
-                filtered_search_result['dict_raw'], shaped_corpus["granularized"], path_raw, path_highlighted)
+        Annotate().annotate(
+            filtered_search_result['dict_raw'], shaped_corpus["granularized"], path_raw, path_highlighted)
 
-            html_pdf = get_html_pdf(path_highlighted)
+        html_pdf = get_html_pdf(path_highlighted)
 
     t1 = time.time()
 
