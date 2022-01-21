@@ -189,7 +189,7 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity):
 
 
 shaped_corpus = None
-if(None not in [corpus, corpus_source_type, granularity]):
+if(None not in [corpus, corpus_source_type, granularity] and corpus != ""):
     if(corpus_source_type in ["text"]):
         shaped_corpus = get_shaped_corpus(
             corpus, corpus_source_type, granularity)
