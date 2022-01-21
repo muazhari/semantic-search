@@ -76,6 +76,7 @@ corpus_source_type = st.radio(
 
 pdf_file = None  # {"url": string, "file_name":numeric}
 corpus = None
+
 if(corpus_source_type in ["text", "web"]):
     corpus = st.text_area('Enter a corpus.')
 
@@ -103,20 +104,19 @@ def get_pdf_from_url(url):
     return pdf_file
 
 
-if(None not in [corpus]):
-    if (corpus_source_type in ['web']):
-        url = corpus
+if (corpus_source_type in ['web']):
+    url = corpus
 
-        options = {
-            'page-size': 'Letter',
-            'margin-top': '0.25in',
-            'margin-right': '1.00in',
-            'margin-bottom': '0.25in',
-            'margin-left': '1.00in',
-        }
+    options = {
+        'page-size': 'Letter',
+        'margin-top': '0.25in',
+        'margin-right': '1.00in',
+        'margin-bottom': '0.25in',
+        'margin-left': '1.00in',
+    }
 
-        if None not in [url]:
-            pdf_file = get_pdf_from_url(url)
+    if None not in [url]:
+        pdf_file = get_pdf_from_url(url)
 
 
 @st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: None})
