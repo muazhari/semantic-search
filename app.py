@@ -160,7 +160,8 @@ if (None not in [pdf_file]):
         splitted_file_name = f'{file_name}_split_{start_page}_to_{end_page}.pdf'
         splitted_file_path = str(ASSETS_PATH / splitted_file_name)
 
-        get_pdf_splitted_page_file(splitted_file_path)
+        if (not os.path.exists(splitted_file_path)):
+            get_pdf_splitted_page_file(splitted_file_path)
 
         corpus = splitted_file_path
 
