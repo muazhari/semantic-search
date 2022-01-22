@@ -367,6 +367,8 @@ if(None not in [corpus, filtered_search_result, shaped_corpus]):
 
         if(os.path.exists(highlighted_file_path)):
             os.remove(highlighted_file_path)
+        else:
+            print("not deleted")
 
         path_raw = corpus
         path_highlighted = highlighted_file_path
