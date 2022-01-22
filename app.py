@@ -85,20 +85,27 @@ corpus_source_type = st.radio(
 pdf_file = None  # {"url": string, "file_name":numeric}
 corpus = None
 
+
+@st.cache
+def get_pdf_from_file_upload(file_upload):
+    file_name = "{}.pdf".format(str(uuid.uuid4()))
+    with open(file_name, "wb") as f:
+        f.write(file_upload.getbuffer())
+
+    file_path = str(ASSETS_PATH / file_name)
+    pdf_file = file_path
+    return pdf_file
+
+
 if(corpus_source_type in ["text", "web"]):
     corpus = st.text_area('Enter a corpus.')
 
 if (corpus_source_type in ['document']):
-    uploaded_file = st.file_uploader(
+    file_upload = st.file_uploader(
         "Upload a document", type=['pdf'], accept_multiple_files=False)
 
-    if None not in [uploaded_file]:
-        file_name = "{}.pdf".format(str(uuid.uuid4()))
-        with open(file_name, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
-        file_path = str(ASSETS_PATH / file_name)
-        pdf_file = file_path
+    if None not in [file_upload]:
+        pdf_file = get_pdf_from_file_upload(file_upload)
         st.success("File uploaded!")
 
 
