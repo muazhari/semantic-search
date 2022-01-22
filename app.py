@@ -114,7 +114,7 @@ if (corpus_source_type in ['document']):
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
-        file_name = "{}.pdf".format(url)
+        file_name = "{}.pdf".format(base64.a85encode(url))
         file_path = str(ASSETS_PATH / file_name)
         pdfkit.from_url(url, file_path, options=options)
         pdf_file = file_path
@@ -134,15 +134,14 @@ if (corpus_source_type in ['web']):
         pdf_file = get_pdf_from_url(corpus)
 
 
-@st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: json.dumps(x.__dict__, sort_keys=True)})
+@st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: hash(x)})
 def get_pdf_splitted_page_file(file_path):
-    if (not os.path.exists(file_path)):
-        pdf_writer = PdfWriter(file_path)
+    pdf_writer = PdfWriter(file_path)
 
-        for page_num in range(start_page - 1, end_page):
-            pdf_writer.addpage(pdf_reader.pages[page_num])
+    for page_num in range(start_page - 1, end_page):
+        pdf_writer.addpage(pdf_reader.pages[page_num])
 
-        pdf_writer.write()
+    pdf_writer.write()
 
     return file_path
 
