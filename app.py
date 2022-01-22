@@ -136,12 +136,13 @@ if (corpus_source_type in ['web']):
 
 @st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: json.dumps(x.__dict__, sort_keys=True)})
 def get_pdf_splitted_page_file(file_path):
-    pdf_writer = PdfWriter(file_path)
+    if (not os.path.exists(file_path)):
+        pdf_writer = PdfWriter(file_path)
 
-    for page_num in range(start_page - 1, end_page):
-        pdf_writer.addpage(pdf_reader.pages[page_num])
+        for page_num in range(start_page - 1, end_page):
+            pdf_writer.addpage(pdf_reader.pages[page_num])
 
-    pdf_writer.write()
+        pdf_writer.write()
 
     return file_path
 
