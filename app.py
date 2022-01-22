@@ -157,9 +157,11 @@ if (None not in [pdf_file]):
         end_page = st.number_input(
             f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-        splitted_file_name = get_pdf_splitted_page_file(
-            f'{file_name}_split_{start_page}_to_{end_page}.pdf')
+        splitted_file_name = f'{file_name}_split_{start_page}_to_{end_page}.pdf'
         splitted_file_path = str(ASSETS_PATH / splitted_file_name)
+
+        get_pdf_splitted_page_file(splitted_file_path)
+
         corpus = splitted_file_path
 
 
