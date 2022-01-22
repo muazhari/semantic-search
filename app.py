@@ -22,8 +22,8 @@ import base64
 
 import uuid
 import os
-import pathlib
 import json
+import pathlib
 
 import tokenizers
 import sqlite3
@@ -71,7 +71,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Row: lambda x: json.dumps(x.__dict__, sort_keys=True)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def get_embeddings(model_name, method, data=None):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True, "method": method})
@@ -246,20 +246,20 @@ if(None not in [shaped_corpus, granularity, window_sizes]):
 
 
 # result = {"id": string, "text": string, "score": numeric}
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Row: lambda x: json.dumps(x.__dict__, sort_keys=True)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def retrieval_search(queries, embeddings, data=None, limit=None):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
     # return [{"corpus_id": id, "score": score} for id, score in embeddings.similarity(queries, data)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Row: lambda x: json.dumps(x.__dict__, sort_keys=True)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def rerank_search(queries, embeddings, similarity, limit):
     results = [result['text']
                for result in retrieval_search(queries, embeddings, limit)]
     return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Row: lambda x: json.dumps(x.__dict__, sort_keys=True)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: None, sqlite3.Connection: lambda x: None, sqlite3.Cursor: lambda x: None, sqlite3.Row: lambda x: None})
 def semantic_search(model_name, query, window_sizes, windowed_granularized_corpus):
     # {window_size: [{"corpus_id": 0, "score": 0}]}
     semantic_search_result = {}
