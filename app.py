@@ -40,7 +40,7 @@ if not ASSETS_PATH.is_dir():
 st.set_page_config(page_title="context-search", )
 
 is_git_sync_button_clicked = st.button("Git repository remote sync")
-if(is_git_sync_button_clicked):
+if (is_git_sync_button_clicked):
     os.chdir("/content/context-search-ui")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
@@ -98,7 +98,7 @@ def get_pdf_from_file_upload(file_upload):
     return pdf_file
 
 
-if(corpus_source_type in ["text", "web"]):
+if (corpus_source_type in ["text", "web"]):
     corpus = st.text_area('Enter a corpus.')
 
 if (corpus_source_type in ['document']):
@@ -136,17 +136,18 @@ if (corpus_source_type in ['web']):
 
 @st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: json.dumps(x.__dict__, sort_keys=True)})
 def get_pdf_splitted_page_file(file_path):
-    pdf_writer = PdfWriter(file_path)
+    if (not os.path.exists(file_path)):
+        pdf_writer = PdfWriter(file_path)
 
-    for page_num in range(start_page - 1, end_page):
-        pdf_writer.addpage(pdf_reader.pages[page_num])
+        for page_num in range(start_page - 1, end_page):
+            pdf_writer.addpage(pdf_reader.pages[page_num])
 
-    pdf_writer.write()
+        pdf_writer.write()
 
     return file_path
 
 
-if(None not in [pdf_file]):
+if (None not in [pdf_file]):
     if (corpus_source_type in ['document', 'web']):
         file_name = os.path.splitext(pdf_file)[0]
         pdf_reader = PdfReader(pdf_file)
@@ -178,7 +179,7 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity):
     raw_corpus = ""  # string
     granularized_corpus = []  # [string, ...]
 
-    if(corpus_source_type in ["text"]):
+    if (corpus_source_type in ["text"]):
         raw_corpus = corpus
         if granularity == "word":
             granularized_corpus += raw_corpus.split(" ")
@@ -188,7 +189,7 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity):
         elif granularity == "paragraph":
             segmentation = Segmentation(paragraphs=True)
             granularized_corpus = segmentation(raw_corpus)
-    elif(corpus_source_type in ["document", "web"]):
+    elif (corpus_source_type in ["document", "web"]):
         if granularity == "word":
             textractor = Textractor()
             raw_corpus = textractor(corpus)
@@ -206,7 +207,7 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity):
 
 
 shaped_corpus = None
-if(None not in [corpus, corpus_source_type, granularity] and corpus != ""):
+if (None not in [corpus, corpus_source_type, granularity] and corpus != ""):
     shaped_corpus = get_shaped_corpus(
         corpus, corpus_source_type, granularity)
 
@@ -227,9 +228,9 @@ def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
                 source_index.append(index)
                 windowed_corpus.append(item)
 
-            if(granularity == 'sentence' or granularity == 'word'):
+            if (granularity == 'sentence' or granularity == 'word'):
                 windowed_corpus = " ".join(windowed_corpus)
-            elif(granularity == 'paragraph'):
+            elif (granularity == 'paragraph'):
                 windowed_corpus = "\n".join(windowed_corpus)
 
             windowed_granularized_corpus[window_size].append(windowed_corpus)
@@ -240,7 +241,7 @@ def get_windowed_granularized_corpus(shaped_corpus, granularity, window_sizes):
 
 
 windowed_granularized_corpus = None
-if(None not in [shaped_corpus, granularity, window_sizes]):
+if (None not in [shaped_corpus, granularity, window_sizes]):
     windowed_granularized_corpus = get_windowed_granularized_corpus(
         shaped_corpus, granularity, window_sizes)
 
@@ -281,7 +282,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
             for source_corpus_index in windowed_granularized_corpus["indexed"][window_size][ssr["corpus_id"]]:
-                if(final_semantic_search_result.get(source_corpus_index, None) is None):
+                if (final_semantic_search_result.get(source_corpus_index, None) is None):
                     final_semantic_search_result[source_corpus_index] = {
                         "count": 1, "score_mean": ssr["score"]}
                     semantic_search_result[window_size] += []
@@ -305,7 +306,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
         for corpus_id in zero_semantic_search_result_ids:
             for source_corpus_index in windowed_granularized_corpus["indexed"][window_size][corpus_id]:
-                if(final_semantic_search_result.get(source_corpus_index, None) is None):
+                if (final_semantic_search_result.get(source_corpus_index, None) is None):
                     final_semantic_search_result[source_corpus_index] = {
                         "count": 1, "score_mean": 0}
 
@@ -313,7 +314,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
 
 search_result = None
-if(None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
+if (None not in [model_name, query, window_sizes, windowed_granularized_corpus]):
     search_result = semantic_search(
         model_name, query, window_sizes, windowed_granularized_corpus)
 
@@ -342,9 +343,9 @@ def get_filtered_search_result(percentage, shaped_corpus, search_result, granula
             html_raw[key])
         html_raw[key] = annotated
 
-    if(granularity == 'sentence' or granularity == 'word'):
+    if (granularity == 'sentence' or granularity == 'word'):
         html_raw = " ".join(html_raw)
-    elif(granularity == 'paragraph'):
+    elif (granularity == 'paragraph'):
         html_raw = "\n".join(html_raw)
 
     html_raw = '<br />'.join(html_raw.splitlines())
@@ -353,7 +354,7 @@ def get_filtered_search_result(percentage, shaped_corpus, search_result, granula
 
 
 filtered_search_result = None
-if(None not in [percentage, shaped_corpus, search_result, granularity]):
+if (None not in [percentage, shaped_corpus, search_result, granularity]):
     filtered_search_result = get_filtered_search_result(
         percentage, shaped_corpus, search_result, granularity)
 
@@ -367,8 +368,8 @@ def get_html_pdf(file_path):
 
 
 html_pdf = None
-if(None not in [corpus, filtered_search_result, shaped_corpus]):
-    if(corpus_source_type in ["document", "web"]):
+if (None not in [corpus, filtered_search_result, shaped_corpus]):
+    if (corpus_source_type in ["document", "web"]):
         file_name = os.path.splitext(corpus)[0]
         highlighted_file_name = f'{file_name}_highlighted_{str(uuid.uuid4())}.pdf'
         highlighted_file_path = str(ASSETS_PATH / highlighted_file_name)
@@ -405,7 +406,7 @@ if(None not in [corpus, filtered_search_result, shaped_corpus]):
     st.write(filtered_search_result["score_mean"])
 
     st.subheader("Output content")
-    if(corpus_source_type in ["document", "web"]):
+    if (corpus_source_type in ["document", "web"]):
         st.markdown(html_pdf, unsafe_allow_html=True)
     else:
         st.write(filtered_search_result["html_raw"], unsafe_allow_html=True)
