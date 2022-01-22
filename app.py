@@ -365,11 +365,6 @@ if(None not in [corpus, filtered_search_result, shaped_corpus]):
         highlighted_file_name = f'{file_name}_highlighted.pdf'
         highlighted_file_path = str(ASSETS_PATH / highlighted_file_name)
 
-        if(os.path.exists(highlighted_file_path)):
-            os.remove(highlighted_file_path)
-        else:
-            print("not deleted")
-
         path_raw = corpus
         path_highlighted = highlighted_file_path
 
@@ -377,6 +372,8 @@ if(None not in [corpus, filtered_search_result, shaped_corpus]):
             filtered_search_result['dict_raw'], shaped_corpus["granularized"], path_raw, path_highlighted)
 
         html_pdf = get_html_pdf(path_highlighted)
+
+        print(html_pdf)
 
     t1 = time.time()
 
