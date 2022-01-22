@@ -114,7 +114,7 @@ if (corpus_source_type in ['document']):
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
-        file_name = "{}.pdf".format(base64.a85encode(url))
+        file_name = "{}.pdf".format(base64.b64encode(url))
         file_path = str(ASSETS_PATH / file_name)
         pdfkit.from_url(url, file_path, options=options)
         pdf_file = file_path
