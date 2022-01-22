@@ -378,6 +378,9 @@ if (None not in [corpus, filtered_search_result, shaped_corpus]):
 
         path_raw = corpus
         path_highlighted = highlighted_file_path
+        
+        if (os.path.exists(path_highlighted)):
+            os.remove(path_highlighted)
 
         Annotate().annotate(
             filtered_search_result['dict_raw'], shaped_corpus["granularized"], path_raw, path_highlighted)
