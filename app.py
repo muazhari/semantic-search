@@ -134,7 +134,7 @@ if (corpus_source_type in ['web']):
         pdf_file = get_pdf_from_url(corpus)
 
 
-@st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: hash(x)})
+@st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: json.dumps(x.__dict__, sort_keys=True)})
 def get_pdf_splitted_page_file(file_path):
     pdf_writer = PdfWriter(file_path)
 
