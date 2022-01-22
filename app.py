@@ -364,6 +364,7 @@ if(None not in [corpus, filtered_search_result, shaped_corpus]):
         file_name = os.path.splitext(corpus)[0]
         highlighted_file_name = f'{file_name}_highlighted.pdf'
         highlighted_file_path = str(ASSETS_PATH / highlighted_file_name)
+        os.remove(highlighted_file_path)
 
         path_raw = corpus
         path_highlighted = highlighted_file_path
