@@ -373,14 +373,11 @@ html_pdf = None
 if (None not in [corpus, filtered_search_result, shaped_corpus]):
     if (corpus_source_type in ["document", "web"]):
         file_name = os.path.splitext(corpus)[0]
-        highlighted_file_name = f'{file_name}_highlighted.pdf'
+        highlighted_file_name = f'{file_name}_highlighted_{str(uuid.uuid4())}.pdf'
         highlighted_file_path = str(ASSETS_PATH / highlighted_file_name)
 
         path_raw = corpus
         path_highlighted = highlighted_file_path
-        
-        if (os.path.exists(path_highlighted)):
-            os.remove(path_highlighted)
 
         Annotate().annotate(
             filtered_search_result['dict_raw'], shaped_corpus["granularized"], path_raw, path_highlighted)
