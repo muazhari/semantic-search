@@ -80,7 +80,7 @@ def get_embeddings(model_name, method, data=None):
 
 
 corpus_source_type = st.radio(
-    "What is corpus source type?", ('text', 'document', 'web'), index=0)
+    "What is corpus source type?", ('plain text', 'document', 'web'), index=0)
 
 
 pdf_file = None  # string
@@ -99,7 +99,7 @@ def get_pdf_from_file_upload(file_upload):
     return pdf_file
 
 
-if (corpus_source_type in ["text", "web"]):
+if (corpus_source_type in ["plain text", "web"]):
     corpus = st.text_area('Enter a corpus.')
 
 if (corpus_source_type in ['document']):
@@ -185,7 +185,7 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity):
     raw_corpus = ""  # string
     granularized_corpus = []  # [string, ...]
 
-    if (corpus_source_type in ["text"]):
+    if (corpus_source_type in ["plain text"]):
         raw_corpus = corpus
         if granularity == "word":
             granularized_corpus += raw_corpus.split(" ")
