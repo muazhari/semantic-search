@@ -383,7 +383,9 @@ html_pdf = None
 if (None not in [corpus, filtered_search_result, shaped_corpus, corpus_source_type, output_type]):
     if (corpus_source_type in ["document", "web"] and output_type in ["default"]):
         file_name = os.path.splitext(os.path.basename(corpus))[0]
-        highlighted_file_base_name = f'{file_name}_highlighted_{percentage}.pdf'
+        query_hash = hashlib.md5(query.encode('utf-8')).hexdigest()
+        percentage_hash = hashlib.md5(str(percentage).encode('utf-8')).hexdigest()
+        highlighted_file_base_name = f'{file_name}_highlighted_{query_hash}_{percentage_hash}.pdf'
         highlighted_file_path = str(ASSETS_PATH / highlighted_file_base_name)
 
         path_raw = corpus
