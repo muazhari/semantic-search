@@ -89,7 +89,8 @@ corpus = None
 
 @st.cache
 def get_pdf_from_file_upload(file_upload):
-    file_base_name = "{}.pdf".format(str(base64.b64encode(file_upload.getbuffer())))
+    file_base_name = "{}.pdf".format(
+        str(base64.b64encode(file_upload.getbuffer())))
     with open(file_base_name, "wb") as f:
         f.write(file_upload.getbuffer())
 
