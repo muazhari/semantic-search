@@ -19,6 +19,7 @@ import pdfrw
 from pdfrw import PdfReader, PdfWriter
 from pyvirtualdisplay import Display
 import base64
+import hashlib
 
 import uuid
 import os
@@ -89,8 +90,8 @@ corpus = None
 
 @st.cache
 def get_pdf_from_file_upload(file_upload):
-    file_base_name = "{}.pdf".format(
-        str(base64.b64encode(file_upload.getbuffer())))
+    file_hash = hashlib.md5(file_upload.getbuffer()).hexdigest()
+    file_base_name = "{}.pdf".format(str(file_hash))
     with open(file_base_name, "wb") as f:
         f.write(file_upload.getbuffer())
 
@@ -115,8 +116,8 @@ if (corpus_source_type in ['document']):
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
-        file_base_name = "{}.pdf".format(
-            str(base64.b64encode(url.encode("utf-8"))))
+        url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
+        file_base_name = "{}.pdf".format(str(url_hash))
         file_path = str(ASSETS_PATH / file_base_name)
         pdfkit.from_url(url, file_path, options=options)
         pdf_file = file_path
