@@ -18,7 +18,6 @@ import pdfkit
 import pdfrw
 from pdfrw import PdfReader, PdfWriter
 from pyvirtualdisplay import Display
-import base64
 import hashlib
 
 import uuid
