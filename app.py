@@ -83,17 +83,17 @@ corpus_source_type = st.radio(
     "What is corpus source type?", ('text', 'document', 'web'), index=0)
 
 
-pdf_file = None  # {"url": string, "file_name":numeric}
+pdf_file = None  # string
 corpus = None
 
 
 @st.cache
 def get_pdf_from_file_upload(file_upload):
-    file_name = "{}.pdf".format(str(uuid.uuid4()))
-    with open(file_name, "wb") as f:
+    file_base_name = "{}.pdf".format(str(uuid.uuid4()))
+    with open(file_base_name, "wb") as f:
         f.write(file_upload.getbuffer())
 
-    file_path = str(ASSETS_PATH / file_name)
+    file_path = str(ASSETS_PATH / file_base_name)
     pdf_file = file_path
     return pdf_file
 
@@ -114,8 +114,9 @@ if (corpus_source_type in ['document']):
 def get_pdf_from_url(url):
     pdf_file = None
     with Display():
-        file_name = "{}.pdf".format(str(base64.b64encode(url.encode("utf-8"))))
-        file_path = str(ASSETS_PATH / file_name)
+        file_base_name = "{}.pdf".format(
+            str(base64.b64encode(url.encode("utf-8"))))
+        file_path = str(ASSETS_PATH / file_base_name)
         pdfkit.from_url(url, file_path, options=options)
         pdf_file = file_path
     return pdf_file
@@ -148,7 +149,7 @@ def get_pdf_splitted_page_file(file_path):
 
 if (None not in [pdf_file]):
     if (corpus_source_type in ['document', 'web']):
-        file_name = os.path.splitext(pdf_file)[0]
+        file_name = os.path.splitext(os.path.basename(pdf_file))[0]
         pdf_reader = PdfReader(pdf_file)
         pdf_max_page = len(pdf_reader.pages)
 
@@ -157,8 +158,8 @@ if (None not in [pdf_file]):
         end_page = st.number_input(
             f"Enter the end page of the pdf you want to be highlighted (1-{pdf_max_page}).", min_value=1, max_value=pdf_max_page, value=1)
 
-        splitted_file_name = f'{file_name}_split_{start_page}_to_{end_page}.pdf'
-        splitted_file_path = str(ASSETS_PATH / splitted_file_name)
+        splitted_file_base_name = f'{file_name}_split_{start_page}_to_{end_page}.pdf'
+        splitted_file_path = str(ASSETS_PATH / splitted_file_base_name)
 
         if (not os.path.exists(splitted_file_path)):
             get_pdf_splitted_page_file(splitted_file_path)
@@ -372,9 +373,9 @@ def get_html_pdf(file_path):
 html_pdf = None
 if (None not in [corpus, filtered_search_result, shaped_corpus]):
     if (corpus_source_type in ["document", "web"]):
-        file_name = os.path.splitext(corpus)[0]
-        highlighted_file_name = f'{file_name}_highlighted_{str(uuid.uuid4())}.pdf'
-        highlighted_file_path = str(ASSETS_PATH / highlighted_file_name)
+        file_name = os.path.splitext(os.path.basename(corpus))[0]
+        highlighted_file_base_name = f'{file_name}_highlighted_{str(uuid.uuid4())}.pdf'
+        highlighted_file_path = str(ASSETS_PATH / highlighted_file_base_name)
 
         path_raw = corpus
         path_highlighted = highlighted_file_path
