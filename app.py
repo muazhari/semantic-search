@@ -176,6 +176,8 @@ window_sizes = st.text_area(
 window_sizes = [int(i) for i in re.split("[^0-9]", window_sizes) if i != ""]
 percentage = st.number_input(
     "Enter the percentage of the text you want to be highlighted.", min_value=0.0, max_value=1.0, value=0.3)
+output_type = st.radio(
+    "What output type do you want to view?", ('default', 'plain text'), index=0)
 
 
 @st.cache
@@ -371,6 +373,12 @@ def get_html_pdf(file_path):
     return pdf_display
 
 
+@st.cache
+def get_annotated_pdf(search_result_raw, granularized_corpus_raw, input_path, output_path):
+    Annotate().annotate(search_result_raw, granularized_corpus_raw, input_path, output_path)
+    return path_highlighted
+
+
 html_pdf = None
 if (None not in [corpus, filtered_search_result, shaped_corpus]):
     if (corpus_source_type in ["document", "web"]):
@@ -381,10 +389,10 @@ if (None not in [corpus, filtered_search_result, shaped_corpus]):
         path_raw = corpus
         path_highlighted = highlighted_file_path
 
-        Annotate().annotate(
+        annotated_pdf_path = get_annotated_pdf(
             filtered_search_result['dict_raw'], shaped_corpus["granularized"], path_raw, path_highlighted)
 
-        html_pdf = get_html_pdf(path_highlighted)
+        html_pdf = get_html_pdf(annotated_pdf_path)
 
         print(html_pdf)
 
@@ -410,8 +418,12 @@ if (None not in [corpus, filtered_search_result, shaped_corpus]):
     st.write(filtered_search_result["score_mean"])
 
     st.subheader("Output content")
-    if (corpus_source_type in ["document", "web"]):
-        st.markdown(html_pdf, unsafe_allow_html=True)
+    if (output_type in ["default"]):
+        if (corpus_source_type in ["document", "web"]):
+            st.markdown(html_pdf, unsafe_allow_html=True)
+        else:
+            st.write(
+                filtered_search_result["html_raw"], unsafe_allow_html=True)
     else:
         st.write(filtered_search_result["html_raw"], unsafe_allow_html=True)
 
