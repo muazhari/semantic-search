@@ -91,10 +91,10 @@ corpus = None
 def get_pdf_from_file_upload(file_upload):
     file_hash = hashlib.md5(file_upload.getbuffer()).hexdigest()
     file_base_name = "{}.pdf".format(str(file_hash))
-    with open(file_base_name, "wb") as f:
+    file_path = str(ASSETS_PATH / file_base_name)
+    with open(file_path, "wb") as f:
         f.write(file_upload.getbuffer())
 
-    file_path = str(ASSETS_PATH / file_base_name)
     pdf_file = file_path
     return pdf_file
 
