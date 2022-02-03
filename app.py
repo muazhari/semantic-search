@@ -83,7 +83,7 @@ corpus_source_type = st.radio(
     "What is corpus source type?", ('plain text', 'document', 'web'), index=0)
 
 
-pdf_file = None  # string
+pdf_file_path = None  # string
 corpus = None
 
 
@@ -95,8 +95,8 @@ def get_pdf_from_file_upload(file_upload):
     with open(file_path, "wb") as f:
         f.write(file_upload.getbuffer())
 
-    pdf_file = file_path
-    return pdf_file
+    pdf_file_path = file_path
+    return pdf_file_path
 
 
 if (corpus_source_type in ["plain text", "web"]):
@@ -107,20 +107,20 @@ if (corpus_source_type in ['document']):
         "Upload a document", type=['pdf'], accept_multiple_files=False)
 
     if None not in [file_upload]:
-        pdf_file = get_pdf_from_file_upload(file_upload)
+        pdf_file_path = get_pdf_from_file_upload(file_upload)
         st.success("File uploaded!")
 
 
 @st.cache
 def get_pdf_from_url(url):
-    pdf_file = None
+    pdf_file_path = None
     with Display():
         url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
         file_base_name = "{}.pdf".format(str(url_hash))
         file_path = str(ASSETS_PATH / file_base_name)
         pdfkit.from_url(url, file_path, options=options)
-        pdf_file = file_path
-    return pdf_file
+        pdf_file_path = file_path
+    return pdf_file_path
 
 
 if (corpus_source_type in ['web']):
@@ -133,25 +133,26 @@ if (corpus_source_type in ['web']):
     }
 
     if (None not in [corpus] and corpus != ""):
-        pdf_file = get_pdf_from_url(corpus)
+        pdf_file_path = get_pdf_from_url(corpus)
 
 
 @st.cache(hash_funcs={pdfrw.objects.pdfstring.PdfString: lambda x: json.dumps(x.__dict__, sort_keys=True)})
-def get_pdf_splitted_page_file(file_path):
-    pdf_writer = PdfWriter(file_path)
+def get_pdf_splitted_page_file(input_file_path, output_file_path):
+    pdf_reader = PdfReader(input_file_path)
+    pdf_writer = PdfWriter(output_file_path)
 
     for page_num in range(start_page - 1, end_page):
         pdf_writer.addpage(pdf_reader.pages[page_num])
 
     pdf_writer.write()
 
-    return file_path
+    return output_file_path
 
 
-if (None not in [pdf_file]):
+if (None not in [pdf_file_path]):
     if (corpus_source_type in ['document', 'web']):
-        file_name = os.path.splitext(os.path.basename(pdf_file))[0]
-        pdf_reader = PdfReader(pdf_file)
+        file_name = os.path.splitext(os.path.basename(pdf_file_path))[0]
+        pdf_reader = PdfReader(pdf_file_path)
         pdf_max_page = len(pdf_reader.pages)
 
         start_page = st.number_input(
@@ -163,7 +164,7 @@ if (None not in [pdf_file]):
         splitted_file_path = str(ASSETS_PATH / splitted_file_base_name)
 
         if (not os.path.exists(splitted_file_path)):
-            get_pdf_splitted_page_file(splitted_file_path)
+            get_pdf_splitted_page_file(pdf_file_path, splitted_file_path)
 
         corpus = splitted_file_path
 
