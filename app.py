@@ -185,8 +185,9 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity):
     raw_corpus = ""  # string
     granularized_corpus = []  # [string, ...]
 
+    raw_corpus = corpus
+
     if (corpus_source_type in ["plain text"]):
-        raw_corpus = corpus
         if granularity == "word":
             granularized_corpus += raw_corpus.split(" ")
         elif granularity == "sentence":
@@ -197,17 +198,13 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity):
             granularized_corpus = segmentation(raw_corpus)
     elif (corpus_source_type in ["document", "web"]):
         if granularity == "word":
-            textractor = Textractor()
-            raw_corpus = textractor(corpus)
             granularized_corpus += raw_corpus.split(" ")
         elif granularity == "sentence":
             textractor = Textractor(sentences=True)
             granularized_corpus = textractor(corpus)
-            raw_corpus = " ".join(granularized_corpus)
         elif granularity == "paragraph":
             textractor = Textractor(paragraphs=True)
             granularized_corpus = textractor(corpus)
-            raw_corpus = "\n".join(granularized_corpus)
 
     return {"raw": raw_corpus, "granularized": granularized_corpus}
 
@@ -384,7 +381,8 @@ if (None not in [corpus, filtered_search_result, shaped_corpus, corpus_source_ty
     if (corpus_source_type in ["document", "web"] and output_type in ["default"]):
         file_name = os.path.splitext(os.path.basename(corpus))[0]
         query_hash = hashlib.md5(query.encode('utf-8')).hexdigest()
-        percentage_hash = hashlib.md5(str(percentage).encode('utf-8')).hexdigest()
+        percentage_hash = hashlib.md5(
+            str(percentage).encode('utf-8')).hexdigest()
         highlighted_file_base_name = f'{file_name}_highlighted_{query_hash}_{percentage_hash}.pdf'
         highlighted_file_path = str(ASSETS_PATH / highlighted_file_base_name)
 
