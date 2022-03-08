@@ -1,27 +1,36 @@
-from annotater import Annotate
-import sqlite3
-import tokenizers
-import pathlib
-import json
-import os
-import uuid
-import hashlib
-from pyvirtualdisplay import Display
-from pdfrw import PdfReader, PdfWriter
-import pdfrw
-import pdfkit
-from txtai.pipeline import Similarity, Segmentation, Textractor
-from txtai.embeddings import Embeddings
-import nltk
-import io
-import time
-import pandas as pd
-import numpy as np
-import more_itertools
-import streamlit as st
-import re
-import torch
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
+
+import torch
+import re
+import streamlit as st
+import more_itertools
+import numpy as np
+import pandas as pd
+import time
+import io
+
+import nltk
+
+from txtai.embeddings import Embeddings
+from txtai.pipeline import Similarity, Segmentation, Textractor
+
+import re
+
+import pdfkit
+import pdfrw
+from pdfrw import PdfReader, PdfWriter
+from pyvirtualdisplay import Display
+import hashlib
+
+import uuid
+import os
+import json
+import pathlib
+
+import tokenizers
+import sqlite3
+
+from annotater import Annotate
 
 
 STREAMLIT_STATIC_PATH = pathlib.Path(st.__path__[0]) / 'static' / 'static'
