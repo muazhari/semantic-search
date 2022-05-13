@@ -281,7 +281,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     semantic_search_result = {}
     # {corpus_id: {"score_mean": 0, count: 0}}
     final_semantic_search_result = {}
-w
+
     for window_size in window_sizes:
         windowed_granularized_corpus_raw_sized = windowed_granularized_corpus["raw"][window_size]
         corpus_len = len(windowed_granularized_corpus_raw_sized)
