@@ -296,7 +296,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         # rerank_model = Similarity(model_name["cross-encoder"])
         # reranked_results = rerank_search(query, retrieved_results, windowed_granularized_corpus_raw_sized, rerank_model)
 
-        semantic_search_result[window_size] = reranked_results
+        semantic_search_result[window_size] = retrieved_results
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
