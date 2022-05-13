@@ -64,15 +64,15 @@ load_nltk()
 bi_encoder_model_name = st.text_area(
     "Enter the name of the pre-trained bi-encoder model from sentence transformers that we are using for searching.",
     value="sentence-transformers/multi-qa-mpnet-base-cos-v1")
-# cross_encoder_model_name = st.text_area(
-#     "Enter the name of the pre-trained cross-encoder model from sentence transformers that we are using for searching.",
-#     value="cross-encoder/ms-marco-MiniLM-L-6-v2")
+cross_encoder_model_name = st.text_area(
+    "Enter the name of the pre-trained cross-encoder model from sentence transformers that we are using for searching.",
+    value="cross-encoder/ms-marco-MiniLM-L-6-v2")
 st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
 st.caption("See the list of pre-trained models that are available here: https://www.sbert.net/docs/pretrained_models.html.")
 
 model_name = {
     "bi-encoder": bi_encoder_model_name,
-    # "cross-encoder": cross_encoder_model_name
+    "cross-encoder": cross_encoder_model_name
 }
 
 
@@ -270,9 +270,9 @@ def retrieval_search(queries, embeddings, data=None, limit=None):
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x), faiss.swigfaiss.IndexIDMap: lambda x: hash(x)})
 def rerank_search(queries, retrieved_documents, windowed_granularized_corpus_raw_sized, rerank_model):
-    reranked_document = [windowed_granularized_corpus_raw_sized[result["corpus_id"]]
+    retrieved_documents = [windowed_granularized_corpus_raw_sized[result["corpus_id"]]
                          for result in retrieved_documents]
-    return [{"corpus_id": id, "score": score} for id, score in rerank_model(queries, reranked_document)]
+    return [{"corpus_id": id, "score": score} for id, score in rerank_model(queries, retrieved_documents)]
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x), faiss.swigfaiss.IndexIDMap: lambda x: hash(x)})
@@ -293,10 +293,10 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         retrieved_results = retrieval_search(
             query, corpus_embeddings, limit=corpus_len)
 
-        # rerank_model = Similarity(model_name["cross-encoder"])
-        # reranked_results = rerank_search(query, retrieved_document, windowed_granularized_corpus_raw_sized, rerank_model)
+        rerank_model = Similarity(model_name["cross-encoder"])
+        reranked_results = rerank_search(query, retrieved_results, windowed_granularized_corpus_raw_sized, rerank_model)
 
-        semantic_search_result[window_size] = retrieved_results
+        semantic_search_result[window_size] = reranked_results
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
