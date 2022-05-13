@@ -72,7 +72,7 @@ st.caption("See the list of pre-trained models that are available here: https://
 
 model_name = {
     "bi-encoder": bi_encoder_model_name,
-    "cross-encoder": cross_encoder_model_name
+    # "cross-encoder": cross_encoder_model_name
 }
 
 
