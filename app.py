@@ -87,7 +87,7 @@ def get_embeddings(model_name, method, data=None):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True, "method": method})
     embeddings.index([(id, text, None) for id, text in enumerate(data)])
-    embeddings.ann.model = faiss.index_cpu_to_all_gpus(embeddings.ann.model)
+    # embeddings.ann.model = faiss.index_cpu_to_all_gpus(embeddings.ann.model)
     return embeddings
 
 
