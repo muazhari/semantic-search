@@ -82,7 +82,7 @@ def hash_tensor(x):
     return bio.getvalue()
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x), faiss.swigfaiss.IndexIDMap: lambda x: hash(x)})
 def get_embeddings(model_name, method, data=None):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True, "method": method})
@@ -271,7 +271,8 @@ def retrieval_search(queries, embeddings, data=None, limit=None):
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def rerank_search(queries, retrieved_documents, windowed_granularized_corpus_raw_sized, rerank_model):
-    reranked_document = [windowed_granularized_corpus_raw_sized[result["corpus_id"]] for result in retrieved_documents]
+    reranked_document = [windowed_granularized_corpus_raw_sized[result["corpus_id"]]
+                         for result in retrieved_documents]
     return [{"corpus_id": id, "score": score} for id, score in rerank_model(queries, reranked_document)]
 
 
@@ -283,13 +284,15 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     final_semantic_search_result = {}
 
     for window_size in window_sizes:
-        windowed_granularized_corpus_raw_sized = windowed_granularized_corpus["raw"][window_size]
+        windowed_granularized_corpus_raw_sized = windowed_granularized_corpus[
+            "raw"][window_size]
         corpus_len = len(windowed_granularized_corpus_raw_sized)
 
         corpus_embeddings = get_embeddings(
             model_name["bi-encoder"], "sentence-transformers", windowed_granularized_corpus_raw_sized)
 
-        retrieved_results = retrieval_search(query, corpus_embeddings, limit=corpus_len)
+        retrieved_results = retrieval_search(
+            query, corpus_embeddings, limit=corpus_len)
 
         # rerank_model = Similarity(model_name["cross-encoder"])
         # reranked_results = rerank_search(query, retrieved_document, windowed_granularized_corpus_raw_sized, rerank_model)
