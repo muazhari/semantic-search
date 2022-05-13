@@ -59,12 +59,22 @@ def load_nltk():
 
 load_nltk()
 
+model_name = None
 
-model_name = st.text_area(
-    "Enter the name of the pre-trained model from sentence transformers that we are using for summarization.",
-    value="sentence-transformers/multi-qa-mpnet-base-cos-v1")
-st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
-st.caption("See the list of pre-trained models that are available here: https://www.sbert.net/docs/pretrained_models.html.")
+if (None not in [model_name]):
+    bi_encoder_model_name = st.text_area(
+        "Enter the name of the pre-trained bi-encoder model from sentence transformers that we are using for summarization.",
+        value="sentence-transformers/multi-qa-mpnet-base-cos-v1")
+    cross_encoder_model_name = st.text_area(
+        "Enter the name of the pre-trained cross-encoder model from sentence transformers that we are using for summarization.",
+        value="sentence-transformers/multi-qa-mpnet-base-cos-v1")
+    st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
+    st.caption("See the list of pre-trained models that are available here: https://www.sbert.net/docs/pretrained_models.html.")
+
+    model_name = {
+        "bi-encoder": bi_encoder_model_name,
+        "cross-encoder": cross_encoder_model_name
+    }
 
 
 def hash_tensor(x):
@@ -78,6 +88,7 @@ def get_embeddings(model_name, method, data=None):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True, "method": method})
     embeddings.index([(id, text, None) for id, text in enumerate(data)])
+    embeddings.ann = embeddings.ann.index_cpu_to_all_gpus(embeddings.ann)
     return embeddings
 
 
@@ -252,7 +263,7 @@ if (None not in [shaped_corpus, granularity, window_sizes]):
         shaped_corpus, granularity, window_sizes)
 
 
-# result = {"id": string, "text": string, "score": numeric}
+# result = (id: string, score: numeric)
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def retrieval_search(queries, embeddings, data=None, limit=None):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
@@ -260,10 +271,9 @@ def retrieval_search(queries, embeddings, data=None, limit=None):
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
-def rerank_search(queries, embeddings, similarity, limit):
-    results = [result['text']
-               for result in retrieval_search(queries, embeddings, limit)]
-    return [{"corpus_id": id, "score": score} for id, score in similarity(queries, results)]
+def rerank_search(queries, retrieved_documents, windowed_granularized_corpus_raw_sized, rerank_model):
+    reranked_document = [windowed_granularized_corpus_raw_sized[result["corpus_id"]] for result in retrieved_documents]
+    return [{"corpus_id": id, "score": score} for id, score in rerank_model(queries, reranked_document)]
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
@@ -274,16 +284,18 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     final_semantic_search_result = {}
 
     for window_size in window_sizes:
-        corpus_len = len(windowed_granularized_corpus["raw"][window_size])
+        windowed_granularized_corpus_raw_sized = windowed_granularized_corpus["raw"][window_size]
+        corpus_len = len(windowed_granularized_corpus_raw_sized)
 
         corpus_embeddings = get_embeddings(
-            model_name, "sentence-transformers", windowed_granularized_corpus["raw"][window_size])
+            model_name["bi-encoder"], "sentence-transformers", windowed_granularized_corpus_raw_sized)
 
-        similarity = Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
-        semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
+        retrieved_results = retrieval_search(query, corpus_embeddings, limit=corpus_len)
 
-        # semantic_search_result[window_size] = retrieval_search(
-        #     (query), corpus_embeddings, limit=corpus_len)
+        # rerank_model = Similarity(model_name["cross-encoder"])
+        # reranked_results = rerank_search(query, retrieved_document, windowed_granularized_corpus_raw_sized, rerank_model)
+
+        semantic_search_result[window_size] = retrieved_results
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
