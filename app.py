@@ -263,20 +263,20 @@ if (None not in [shaped_corpus, granularity, window_sizes]):
 
 
 # result = (id: string, score: numeric)
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x), faiss.swigfaiss.IndexIDMap: lambda x: hash(x)})
 def retrieval_search(queries, embeddings, data=None, limit=None):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
     # return [{"corpus_id": id, "score": score} for id, score in embeddings.similarity(queries, data)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x), faiss.swigfaiss.IndexIDMap: lambda x: hash(x)})
 def rerank_search(queries, retrieved_documents, windowed_granularized_corpus_raw_sized, rerank_model):
     reranked_document = [windowed_granularized_corpus_raw_sized[result["corpus_id"]]
                          for result in retrieved_documents]
     return [{"corpus_id": id, "score": score} for id, score in rerank_model(queries, reranked_document)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x), faiss.swigfaiss.IndexIDMap: lambda x: hash(x)})
 def semantic_search(model_name, query, window_sizes, windowed_granularized_corpus):
     # {window_size: [{"corpus_id": 0, "score": 0}]}
     semantic_search_result = {}
