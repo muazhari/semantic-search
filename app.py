@@ -12,6 +12,7 @@ import nltk
 from txtai.embeddings import Embeddings
 from txtai.pipeline import Similarity, Segmentation, Textractor
 
+import faiss
 import re
 
 import pdfkit
@@ -63,9 +64,9 @@ load_nltk()
 bi_encoder_model_name = st.text_area(
     "Enter the name of the pre-trained bi-encoder model from sentence transformers that we are using for searching.",
     value="sentence-transformers/multi-qa-mpnet-base-cos-v1")
-cross_encoder_model_name = st.text_area(
-    "Enter the name of the pre-trained cross-encoder model from sentence transformers that we are using for searching.",
-    value="cross-encoder/ms-marco-MiniLM-L-6-v2")
+# cross_encoder_model_name = st.text_area(
+#     "Enter the name of the pre-trained cross-encoder model from sentence transformers that we are using for searching.",
+#     value="cross-encoder/ms-marco-MiniLM-L-6-v2")
 st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
 st.caption("See the list of pre-trained models that are available here: https://www.sbert.net/docs/pretrained_models.html.")
 
@@ -86,7 +87,7 @@ def get_embeddings(model_name, method, data=None):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "objects": True, "method": method})
     embeddings.index([(id, text, None) for id, text in enumerate(data)])
-    embeddings.ann = embeddings.ann.index_cpu_to_all_gpus(embeddings.ann)
+    embeddings.ann = embeddings.ann.model.index_cpu_to_all_gpus(embeddings.ann)
     return embeddings
 
 
@@ -280,7 +281,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     semantic_search_result = {}
     # {corpus_id: {"score_mean": 0, count: 0}}
     final_semantic_search_result = {}
-
+w
     for window_size in window_sizes:
         windowed_granularized_corpus_raw_sized = windowed_granularized_corpus["raw"][window_size]
         corpus_len = len(windowed_granularized_corpus_raw_sized)
