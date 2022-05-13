@@ -279,11 +279,11 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         corpus_embeddings = get_embeddings(
             model_name, "sentence-transformers", windowed_granularized_corpus["raw"][window_size])
 
-        similarity = Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
-        semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
+        # similarity = Similarity("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        # semantic_search_result[window_size] = rerank_search((query), corpus_embeddings, similarity, corpus_len)
 
-        # semantic_search_result[window_size] = retrieval_search(
-        #     (query), corpus_embeddings, limit=corpus_len)
+        semantic_search_result[window_size] = retrieval_search(
+            (query), corpus_embeddings, limit=corpus_len)
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
