@@ -331,7 +331,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
 
 search_result = None
-if (any(x in [None, ""] for x in [model_name, query, window_sizes, windowed_granularized_corpus])):
+if (not any(x in [None, ""] for x in [model_name, query, window_sizes, windowed_granularized_corpus])):
     search_result = semantic_search(
         model_name, query, window_sizes, windowed_granularized_corpus)
 
