@@ -83,10 +83,11 @@ def hash_tensor(x):
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
-def get_embeddings(model_name, method, data):
+def get_embeddings(model_name, method, data=None):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "method": method})
-    embeddings.index([(id, text, None) for id, text in data])
+    if data is not None:
+        embeddings.index([(id, text, None) for id, text in data])
     return embeddings
 
 
@@ -273,7 +274,7 @@ def retrieval_search(queries, corpus, model_name, limit=None):
 def rerank_search(queries, retrieved_corpus, corpus, model_name):
     reformed__retrieved_corpus = [(result["corpus_id"], corpus[result["corpus_id"]])
               for result in retrieved_corpus]
-    embeddings = get_embeddings(model_name, "sentence-transformers", None)
+    embeddings = get_embeddings(model_name, "transformers")
     return [{"corpus_id": id, "score": score} for id, score in embeddings.similarity(queries, reformed__retrieved_corpus)]
 
 
