@@ -292,11 +292,11 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         retrieved_corpus = []
         reranked_corpus = []
         
-        if model_name.get("bi-encoder", None) is not None:
+        if model_name.get("bi-encoder", "") is not "":
             retrieved_corpus = retrieval_search(
                 query, corpus, model_name["bi-encoder"], limit=corpus_len)
 
-        if model_name.get("cross-encoder", None) is not None:
+        if model_name.get("cross-encoder", "") is not "":
             reranked_corpus = rerank_search(
                 query, retrieved_corpus, corpus, model_name["cross-encoder"])
 
