@@ -273,7 +273,7 @@ def retrieval_search(queries, corpus, model_name, limit=None):
 def rerank_search(queries, retrieved_corpus, corpus, model_name):
     reformed__retrieved_corpus = [(result["corpus_id"], corpus[result["corpus_id"]])
               for result in retrieved_corpus]
-    embeddings = get_embeddings(model_name, "sentence-transformers")
+    embeddings = get_embeddings(model_name, "sentence-transformers", None)
     return [{"corpus_id": id, "score": score} for id, score in embeddings.similarity(queries, reformed__retrieved_corpus)]
 
 
