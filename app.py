@@ -396,7 +396,7 @@ if (None not in [corpus, filtered_search_result, shaped_corpus, corpus_source_ty
     if (corpus_source_type in ["document", "web"] and output_type in ["default"]):
         file_name = os.path.splitext(os.path.basename(corpus))[0]
         query_hash = hashlib.md5(query.encode('utf-8')).hexdigest()
-        model_name_hash = hashlib.md5(model_name.encode('utf-8')).hexdigest()
+        model_name_hash = hashlib.md5(hash(model_name)).hexdigest()
         percentage_hash = hashlib.md5(
             str(percentage).encode('utf-8')).hexdigest()
         highlighted_file_base_name = f'{file_name}_highlighted_{model_name_hash}_{query_hash}_{percentage_hash}.pdf'
