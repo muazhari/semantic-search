@@ -63,7 +63,7 @@ load_nltk()
 
 bi_encoder_model_name = st.text_area(
     "Enter the name of the pre-trained bi-encoder model from sentence transformers that we are using for searching.",
-    value="sentence-transformers/multi-qa-mpnet-base-cos-v1")
+    value="sentence-transformers/msmarco-distilbert-base-v4")
 cross_encoder_model_name = st.text_area(
     "Enter the name of the pre-trained cross-encoder model from sentence transformers that we are using for searching.",
     value="cross-encoder/ms-marco-MiniLM-L-12-v2")
