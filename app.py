@@ -272,7 +272,7 @@ def retrieval_search(queries, corpus, model_name, limit=None):
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def rerank_search(queries, retrieved_corpus, corpus, model_name, limit=None):
     reformed_retrieved_corpus = [(result["corpus_id"], corpus[result["corpus_id"]])
-                                  for result in retrieved_corpus]
+                                 for result in retrieved_corpus]
     embeddings = get_embeddings(
         model_name, "transformers", reformed_retrieved_corpus)
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
@@ -396,7 +396,8 @@ if (None not in [corpus, filtered_search_result, shaped_corpus, corpus_source_ty
     if (corpus_source_type in ["document", "web"] and output_type in ["default"]):
         file_name = os.path.splitext(os.path.basename(corpus))[0]
         query_hash = hashlib.md5(query.encode('utf-8')).hexdigest()
-        model_name_hash = hashlib.md5(hash(model_name)).hexdigest()
+        model_name_hash = hashlib.md5(json.dumps(
+            model_name, sort_keys=True)).hexdigest()
         percentage_hash = hashlib.md5(
             str(percentage).encode('utf-8')).hexdigest()
         highlighted_file_base_name = f'{file_name}_highlighted_{model_name_hash}_{query_hash}_{percentage_hash}.pdf'
