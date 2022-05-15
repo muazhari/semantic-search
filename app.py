@@ -275,7 +275,8 @@ def rerank_search(queries, retrieved_corpus, corpus, model_name, limit=None):
                                   for result in retrieved_corpus]
     embeddings = get_embeddings(
         model_name, "transformers", reformed__retrieved_corpus)
-    return [{"corpus_id": id, "score": score} for id, score in embeddings.search(queries, limit)]
+    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
+
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
