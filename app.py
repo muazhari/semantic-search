@@ -278,7 +278,6 @@ def rerank_search(queries, retrieved_corpus, corpus, model_name, limit=None):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
 
 
-
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def semantic_search(model_name, query, window_sizes, windowed_granularized_corpus):
     # {window_size: [{"corpus_id": 0, "score": 0}]}
@@ -296,7 +295,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         reranked_corpus = rerank_search(
             query, retrieved_corpus, corpus, model_name["cross-encoder"])
 
-        semantic_search_result[window_size] = reranked_corpus
+        semantic_search_result[window_size] = reranked_corpus + retrieved_corpus
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
