@@ -288,12 +288,17 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
     for window_size in window_sizes:
         corpus = windowed_granularized_corpus["raw"][window_size]
         corpus_len = len(corpus)
+        
+        retrieved_corpus = []
+        reranked_corpus = []
+        
+        if model_name.get("bi-encoder", None) is not None:
+            retrieved_corpus = retrieval_search(
+                query, corpus, model_name["bi-encoder"], limit=corpus_len)
 
-        retrieved_corpus = retrieval_search(
-            query, corpus, model_name["bi-encoder"], limit=corpus_len)
-
-        reranked_corpus = rerank_search(
-            query, retrieved_corpus, corpus, model_name["cross-encoder"])
+        if model_name.get("cross-encoder", None) is not None:
+            reranked_corpus = rerank_search(
+                query, retrieved_corpus, corpus, model_name["cross-encoder"])
 
         semantic_search_result[window_size] = reranked_corpus + retrieved_corpus
 
