@@ -264,16 +264,17 @@ if (None not in [shaped_corpus, granularity, window_sizes]):
 # result = (id: string, score: numeric)
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def retrieval_search(queries, corpus, model_name, limit=None):
-    embeddings = get_embeddings(model_name, "sentence-transformers", enumerate(corpus))
+    embeddings = get_embeddings(
+        model_name, "sentence-transformers", enumerate(corpus))
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
-def rerank_search(queries, retrieved_corpus, corpus):
+def rerank_search(queries, retrieved_corpus, corpus, model_name):
     corpus = [(result["corpus_id"], corpus[result["corpus_id"]])
               for result in retrieved_corpus]
     embeddings = get_embeddings(
-        model_name["cross-encoder"], "sentence-transformers", enumerate(retrieved_corpus))
+        model_name, "sentence-transformers", enumerate(retrieved_corpus))
     return [{"corpus_id": id, "score": score} for id, score in embeddings.similarity(queries, corpus)]
 
 
@@ -292,7 +293,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
             query, corpus, model_name["bi-encoder"], limit=corpus_len)
 
         reranked_corpus = rerank_search(
-            query, retrieved_corpus, corpus)
+            query, retrieved_corpus, corpus, model_name["cross-encoder"])
 
         semantic_search_result[window_size] = reranked_corpus
 
