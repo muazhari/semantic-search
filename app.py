@@ -66,7 +66,7 @@ retriever_model_name = st.text_area(
     value="sentence-transformers/msmarco-distilbert-base-v4")
 reranker_model_name = st.text_area(
     "Enter the name of the pre-trained reranker model from sentence transformers that we are using for searching.",
-    value="reranker/ms-marco-MiniLM-L-12-v2")
+    value="cross-encoder/ms-marco-MiniLM-L-12-v2")
 st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
 st.caption("See the list of pre-trained models that are available here: https://www.sbert.net/docs/pretrained_models.html.")
 
