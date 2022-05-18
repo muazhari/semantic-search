@@ -265,7 +265,7 @@ if (None not in [shaped_corpus, granularity, window_sizes]):
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def retrieval_search(queries, corpus, model_name, limit=None):
     embeddings = get_embeddings(
-        model_name, "sentence-transformers", enumerate(corpus))
+        model_name, "transformers", enumerate(corpus))
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
 
 
