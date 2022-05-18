@@ -83,7 +83,7 @@ def hash_tensor(x):
 
 
 def hash_parameter(x):
-    y = x.view(np.uint8)
+    y = x.data.numpy().view(np.uint8)
     return hashlib.sha1(y).hexdigest()
 
 
