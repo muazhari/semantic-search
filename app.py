@@ -85,8 +85,11 @@ def hash_tensor(x):
 def hash_parameter(x):
     return hash_tensor(x.data)
 
+def hash_tokenizer(x):
+    return json.dumps(x.__dict__, sort_keys=True)
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
+
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: hash_tokenizer, tokenizers.AddedToken: hash_tokenizer, sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def get_embeddings(model_name, method, data):
     embeddings = Embeddings(
         {"path": model_name, "content": True, "method": method})
@@ -266,14 +269,14 @@ if (None not in [shaped_corpus, granularity, window_sizes]):
 
 
 # result = (id: string, score: numeric)
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: hash_tokenizer, tokenizers.AddedToken: hash_tokenizer, sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def retrieval_search(queries, corpus, model_name, limit=None):
     embeddings = get_embeddings(
         model_name, "transformers", enumerate(corpus))
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: hash_tokenizer, tokenizers.AddedToken: hash_tokenizer, sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def rerank_search(queries, retrieved_corpus, corpus, model_name, limit=None):
     reformed_retrieved_corpus = [(result["corpus_id"], corpus[result["corpus_id"]])
                                  for result in retrieved_corpus]
@@ -282,7 +285,7 @@ def rerank_search(queries, retrieved_corpus, corpus, model_name, limit=None):
     return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
 
 
-@st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
+@st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: hash_tokenizer, tokenizers.AddedToken: hash_tokenizer, sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def semantic_search(model_name, query, window_sizes, windowed_granularized_corpus):
     # {window_size: [{"corpus_id": 0, "score": 0}]}
     semantic_search_result = {}
