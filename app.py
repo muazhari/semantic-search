@@ -1,3 +1,4 @@
+from sqlalchemy import true
 import torch
 import re
 import streamlit as st
@@ -32,7 +33,7 @@ import sqlite3
 from annotater import Annotate
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
-
+os.environ['TOKENIZERS_PARALLELISM'] = true
 
 STREAMLIT_STATIC_PATH = pathlib.Path(st.__path__[0]) / 'static' / 'static'
 
