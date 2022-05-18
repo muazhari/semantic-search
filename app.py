@@ -61,18 +61,18 @@ def load_nltk():
 load_nltk()
 
 
-bi_encoder_model_name = st.text_area(
-    "Enter the name of the pre-trained bi-encoder model from sentence transformers that we are using for searching.",
+retriever_model_name = st.text_area(
+    "Enter the name of the pre-trained retriever model from sentence transformers that we are using for searching.",
     value="sentence-transformers/msmarco-distilbert-base-v4")
-cross_encoder_model_name = st.text_area(
-    "Enter the name of the pre-trained cross-encoder model from sentence transformers that we are using for searching.",
-    value="cross-encoder/ms-marco-MiniLM-L-12-v2")
+reranker_model_name = st.text_area(
+    "Enter the name of the pre-trained reranker model from sentence transformers that we are using for searching.",
+    value="reranker/ms-marco-MiniLM-L-12-v2")
 st.caption("This will download a new model, so it may take awhile or even break if the model is too large.")
 st.caption("See the list of pre-trained models that are available here: https://www.sbert.net/docs/pretrained_models.html.")
 
 model_name = {
-    "bi-encoder": bi_encoder_model_name,
-    "cross-encoder": cross_encoder_model_name
+    "retriever": retriever_model_name,
+    "reranker": reranker_model_name
 }
 
 
@@ -292,13 +292,13 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         retrieved_corpus = []
         reranked_corpus = []
         
-        if model_name.get("bi-encoder", "") is not "":
+        if model_name.get("retriever", "") is not "":
             retrieved_corpus = retrieval_search(
-                query, corpus, model_name["bi-encoder"], limit=corpus_len)
+                query, corpus, model_name["retriever"], limit=corpus_len)
 
-        if model_name.get("cross-encoder", "") is not "":
+        if model_name.get("reranker", "") is not "":
             reranked_corpus = rerank_search(
-                query, retrieved_corpus, corpus, model_name["cross-encoder"])
+                query, retrieved_corpus, corpus, model_name["reranker"])
 
         semantic_search_result[window_size] = reranked_corpus + retrieved_corpus
 
