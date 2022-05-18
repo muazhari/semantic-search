@@ -83,8 +83,7 @@ def hash_tensor(x):
 
 
 def hash_parameter(x):
-    y = x.data.numpy().view(np.uint8)
-    return hashlib.sha1(y).hexdigest()
+    return hash_tensor(x.data)
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: lambda x: json.dumps(x.__dict__, sort_keys=True), sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
