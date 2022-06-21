@@ -9,7 +9,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 - Asymetric/Symetric Semantic Search.
 - Plug-and-Play Retriever Model & Reranker Model (Optional).
 - Text, Web, and Pdf Input to Text and Pdf Output format.
-- Highlighter.
+- Output Highlighter.
 - Processing time & Score Statistics.
 - Raw results for inspecting.
 
