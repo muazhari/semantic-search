@@ -10,7 +10,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 - Plug-and-Play Retriever Model & Reranker Model (Optional).
 - Text, Web, and Document Input-Output format.
 - Highlighter.
-- Score Statistics.
+- Processing time & Score Statistics.
 - Raw results for inspecting.
 
 ## Acknowledgements
