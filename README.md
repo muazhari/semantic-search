@@ -32,7 +32,6 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 ```python
 #@title Context Search App
 NGROK_TOKEN = "" #@param {type:"string"} 
-PASSWORD = "terserah" #@param {type:"string"} 
 sh = """
 cd /content
 git clone https://github.com/muazhari/context-search.git
