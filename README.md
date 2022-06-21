@@ -24,7 +24,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 
 ## Demo
 
-![](https://github.com/muazhari/context-search/blob/main/demo.mp4)
+[![demo](http://img.youtube.com/vi/bu93G6YesaQ/0.jpg)](http://www.youtube.com/watch?v=bu93G6YesaQ)
 
 ## Installation
 
