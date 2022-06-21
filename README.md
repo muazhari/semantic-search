@@ -47,7 +47,6 @@ apt-get install wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils
 cd /content/context-search/
 pip install -r requirements.txt
 pip install txtai[pipeline,similarity]
-# pip install colab_ssh --upgrade
 """
 with open('script.sh', 'w') as file:
   file.write(sh)
