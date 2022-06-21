@@ -26,7 +26,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 
 [![demo](http://img.youtube.com/vi/bu93G6YesaQ/0.jpg)](http://www.youtube.com/watch?v=bu93G6YesaQ)
 
-## Installation
+## Walkthrough 
 
 1. Get your ngrok Authentication Token.
 2. Create cell based on below Jupyter Notebook script in Google Colab or other alternatives.
@@ -71,6 +71,9 @@ print("Open public URL:")
 3. Submit your ngrok Authentication Token to `NGROK_TOKEN` coloumn in the cell form.
 4. Enable GPU in the Notebook.
 5. Run the cell.
+6. Wait until setups are done.
+7. Open ngrok public URL.
+8. Use the app.
 
 
     
