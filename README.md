@@ -10,6 +10,8 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 - Plug-and-Play Embedding & Reranker Model.
 - Text, Web, and Document Input-Output format.
 - Highlighter.
+- Score Statistics.
+- Raw results for inspecting.
 
 ## Acknowledgements
 
