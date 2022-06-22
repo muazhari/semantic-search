@@ -11,7 +11,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 - Text, Web, and Pdf Input to Text and Pdf Output format.
 - Output Highlighter.
 - Processing time statistic & Score statistics.
-- Caching to speedup reprocessing (Click refresh button to clear unsued data in RAM after repeated unique processing).
+- Caching to speedup reprocessing (Click refresh button to clear unused data in RAM after repeated unique processing).
 - Raw results for inspecting.
 
 ## Acknowledgements
