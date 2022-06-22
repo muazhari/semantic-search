@@ -11,5 +11,4 @@ streamlit
 txtai
 txtmarker
 faiss-gpu
-sqlalchemy
 
