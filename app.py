@@ -43,7 +43,7 @@ if not ASSETS_PATH.is_dir():
 
 st.set_page_config(page_title="context-search", )
 
-is_git_sync_button_clicked = st.button("Git repository remote sync")
+is_git_sync_button_clicked = st.button("Git remote repository sync")
 if (is_git_sync_button_clicked):
     os.chdir("/content/context-search")
     os.system('git fetch --all')
