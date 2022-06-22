@@ -41,11 +41,11 @@ ASSETS_PATH = (STREAMLIT_STATIC_PATH / "assets")
 if not ASSETS_PATH.is_dir():
     ASSETS_PATH.mkdir()
 
-st.set_page_config(page_title="context-search", )
+st.set_page_config(page_title="semantic-search", )
 
 is_git_sync_button_clicked = st.button("Git remote repository sync")
 if (is_git_sync_button_clicked):
-    os.chdir("/content/context-search")
+    os.chdir("/content/semantic-search")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
     st.legacy_caching.clear_cache()
@@ -433,7 +433,7 @@ if (None not in [corpus, filtered_search_result, shaped_corpus, corpus_source_ty
 
     st.subheader("Output score overview")
     st.caption(
-        "Metric to determine how sure the context of query is in the corpus (score to search result in descending order).")
+        "Metric to determine how sure the meaning of query is in the corpus (score to search result in descending order).")
     chart_df = pd.DataFrame(
         [result['score_mean'] for result in sorted(search_result["aggregated"].values(
         ), key=lambda x: x["score_mean"], reverse=True)],
@@ -444,7 +444,7 @@ if (None not in [corpus, filtered_search_result, shaped_corpus, corpus_source_ty
 
     st.subheader("Output score mean")
     st.caption(
-        "Metric to determine how sure the context of query is in the highlighted corpus.")
+        "Metric to determine how sure the meaning of query is in the highlighted corpus.")
     st.write(filtered_search_result["score_mean"])
 
     st.subheader("Output content")
