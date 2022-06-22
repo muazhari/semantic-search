@@ -1,5 +1,5 @@
 
-# Context Search
+# Semantic Search
 
 Modification of CX_DB8 project by refactoring the code, adding user interface, and adding minor functional features.
 
@@ -33,19 +33,19 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 2. Create cell based on below Jupyter Notebook script in Google Colab or other alternatives.
 
 ```python
-#@title Context Search App
+#@title Semantic Search App
 NGROK_TOKEN = "" #@param {type:"string"} 
 sh = """
 cd /content
-git clone https://github.com/muazhari/context-search.git
-cd /content/context-search/
+git clone https://github.com/muazhari/semantic-search.git
+cd /content/semantic-search/
 git fetch --all
 git reset --hard origin
 
 apt-get update
 apt-get install wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils
 
-cd /content/context-search/
+cd /content/semantic-search/
 pip install -r requirements.txt
 pip install txtai[pipeline,similarity]
 """
@@ -64,7 +64,7 @@ get_ipython().system_raw('./ngrok http 8501 &')
 !apt-get install jq
 print("Open public URL:")
 !curl -s http://localhost:4040/api/tunnels | jq ".tunnels[0].public_url"
-!streamlit run /content/context-search/app.py
+!streamlit run /content/semantic-search/app.py
 
 !sleep 10000000
 ```
