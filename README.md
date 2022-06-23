@@ -72,7 +72,7 @@ print("Open public URL:")
 3. Submit your ngrok Authentication Token to `NGROK_TOKEN` coloumn in the cell form.
 4. Enable GPU in the Notebook.
 5. Run the cell.
-6. Wait until setups are done.
+6. Wait until the setups are done.
 7. Open ngrok public URL.
 8. Use the app.
 
