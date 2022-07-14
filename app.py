@@ -63,7 +63,7 @@ load_nltk()
 
 retriever_model_name = st.text_area(
     "Enter the name of the pre-trained retriever model from sentence transformers that we are using for searching.",
-    value="sentence-transformers/msmarco-distilbert-base-v4")
+    value="sentence-transformers/multi-qa-MiniLM-L6-cos-v1")
 reranker_model_name = st.text_area(
     "Enter the name of the pre-trained reranker model from sentence transformers that we are using for searching. Enter blank to ignore the usage of this model.",
     value="")
