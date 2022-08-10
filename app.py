@@ -299,11 +299,11 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         retrieved_corpus = []
         reranked_corpus = []
         
-        if model_name.get("retriever", "") is not "":
+        if model_name.get("retriever", "") != "":
             retrieved_corpus = retrieval_search(
                 query, corpus, model_name["retriever"], limit=corpus_len)
 
-        if model_name.get("reranker", "") is not "":
+        if model_name.get("reranker", "") != "":
             reranked_corpus = rerank_search(
                 query, retrieved_corpus, corpus, model_name["reranker"])
 
