@@ -10,7 +10,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 - Plug-and-Play Retriever Model & Reranker Model (Optional).
 - Text, Web, and Pdf Input to Text and Pdf Output format.
 - Output Highlighter.
-- Processing time statistic & Score statistics.
+- Processing time & Score statistics.
 - Caching to speedup reprocessing (Click "Git remote repository sync" button to clear unused data in RAM after repeated unique processing).
 - Raw results for inspecting.
 
@@ -47,7 +47,7 @@ yes | DEBIAN_FRONTEND=noninteractive apt-get install -yqq wkhtmltopdf xvfb libop
 
 cd ~/semantic-search/
 pip install -r requirements.txt
-pip install txtai[pipeline,similarity]
+pip install txtai[pipeline,similarity] pyngrok
 """
 with open('script.sh', 'w') as file:
   file.write(sh)
@@ -57,10 +57,8 @@ with open('script.sh', 'w') as file:
 !nvidia-smi
 
 %cd ~
-!wget -nc https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-!unzip -n ngrok-stable-linux-amd64.zip 
-get_ipython().system_raw('./ngrok authtoken {NGROK_TOKEN}'.format(NGROK_TOKEN=NGROK_TOKEN))
-get_ipython().system_raw('./ngrok http 8501 &')
+get_ipython().system_raw('ngrok authtoken {NGROK_TOKEN}'.format(NGROK_TOKEN=NGROK_TOKEN))
+get_ipython().system_raw('ngrok http 8501 &')
 !apt-get install jq
 print("Open public URL:")
 !curl -s http://localhost:4040/api/tunnels | jq ".tunnels[0].public_url"
