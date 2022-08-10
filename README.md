@@ -35,28 +35,21 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 ```python
 #@title Semantic Search App
 NGROK_TOKEN = "" #@param {type:"string"} 
-sh = """
-cd ~
-git clone https://github.com/muazhari/semantic-search.git
-cd ~/semantic-search/
-git fetch --all
-git reset --hard origin
 
-apt-get -y update
-yes | DEBIAN_FRONTEND=noninteractive apt-get install -yqq wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils openjdk-8-jdk
+%cd ~
+!git clone https://github.com/muazhari/semantic-search.git
+%cd ~/semantic-search/
+!git fetch --all
+!git reset --hard origin
 
-cd ~/semantic-search/
-pip install -r requirements.txt
-pip install txtai[pipeline,similarity] pyngrok
-"""
-with open('script.sh', 'w') as file:
-  file.write(sh)
+!apt-get update -y
+!yes | DEBIAN_FRONTEND=noninteractive apt-get install -yqq wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils openjdk-8-jdk
 
-!bash script.sh
+!pip install -r requirements.txt
+!pip install txtai[pipeline,similarity] pyngrok
 
 !nvidia-smi
 
-%cd ~
 get_ipython().system_raw('ngrok authtoken {NGROK_TOKEN}'.format(NGROK_TOKEN=NGROK_TOKEN))
 get_ipython().system_raw('ngrok http 8501 &')
 !apt-get install jq
