@@ -44,7 +44,7 @@ st.set_page_config(page_title="semantic-search", )
 
 is_git_sync_button_clicked = st.button("Git remote repository sync")
 if (is_git_sync_button_clicked):
-    os.chdir("~/semantic-search")
+    os.chdir("./")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
     st.legacy_caching.clear_cache()
