@@ -312,7 +312,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
             for source_corpus_index in windowed_granularized_corpus["indexed"][window_size][ssr["corpus_id"]]:
-                if (final_semantic_search_result.get(source_corpus_index, None) is None):
+                if (final_semantic_search_result.get(source_corpus_index, None) == None):
                     final_semantic_search_result[source_corpus_index] = {
                         "count": 1, "score_mean": ssr["score"]}
                     semantic_search_result[window_size] += []
@@ -336,7 +336,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
 
         for corpus_id in zero_semantic_search_result_ids:
             for source_corpus_index in windowed_granularized_corpus["indexed"][window_size][corpus_id]:
-                if (final_semantic_search_result.get(source_corpus_index, None) is None):
+                if (final_semantic_search_result.get(source_corpus_index, None) == None):
                     final_semantic_search_result[source_corpus_index] = {
                         "count": 1, "score_mean": 0}
 
