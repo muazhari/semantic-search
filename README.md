@@ -43,7 +43,7 @@ git fetch --all
 git reset --hard origin
 
 apt-get -y update
-yes | DEBIAN_FRONTEND=noninteractive apt-get install -yqq wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils
+yes | DEBIAN_FRONTEND=noninteractive apt-get install -yqq wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils openjdk-8-jdk
 
 cd ~/semantic-search/
 pip install -r requirements.txt
