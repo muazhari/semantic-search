@@ -47,7 +47,7 @@ if (is_git_sync_button_clicked):
     os.chdir("./")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
-    st.legacy_caching.clear_cache()
+    st.caching.clear_cache()
 
 
 t0 = time.time()
