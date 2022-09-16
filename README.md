@@ -7,7 +7,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 ## Features
 
 - Asymetric/Symetric Semantic Search based on the given model.
-- Plug-and-Play Retriever Model & Reranker Model (Not yet validated).
+- Plug-and-Play Retriever Model & Reranker Model.
 - Text, Web, and Pdf Input to Text and Pdf Output format.
 - Output Highlighter.
 - Processing time & Score statistics.
@@ -66,6 +66,9 @@ print("Open public URL:")
 6. Wait until the setups are done.
 7. Open ngrok public URL.
 8. Use the app.
+
+## Warning
+- This repository not yet peer reviewed, so be careful when using it.
 
 
     
