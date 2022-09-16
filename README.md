@@ -43,7 +43,7 @@ NGROK_TOKEN = "" #@param {type:"string"}
 !git reset --hard origin
 
 !apt-get update -y
-!yes | DEBIAN_FRONTEND=noninteractive apt-get install -yqq wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils openjdk-8-jdk
+!yes | DEBIAN_FRONTEND=noninteractive apt-get install -yqq wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils openjdk-8-jdk jq
 
 !pip install -r requirements.txt
 !pip install txtai[pipeline,similarity] pyngrok
@@ -52,7 +52,6 @@ NGROK_TOKEN = "" #@param {type:"string"}
 
 get_ipython().system_raw('ngrok authtoken {NGROK_TOKEN}'.format(NGROK_TOKEN=NGROK_TOKEN))
 get_ipython().system_raw('ngrok http 8501 &')
-!apt-get install jq
 print("Open public URL:")
 !curl -s http://localhost:4040/api/tunnels | jq ".tunnels[0].public_url"
 !streamlit run ~/semantic-search/app.py
