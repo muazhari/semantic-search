@@ -98,7 +98,7 @@ def get_embeddings(model_name, method, data):
 
 
 corpus_source_type = st.radio(
-    "What is corpus source type?", ('plain text', 'document', 'web'), index=0)
+    "What is corpus source type?", ('plain text', 'file', 'web'), index=0)
 
 
 pdf_file_path = None  # string
@@ -120,9 +120,9 @@ def get_pdf_from_file_upload(file_upload):
 if (corpus_source_type in ["plain text", "web"]):
     corpus = st.text_area('Enter a corpus.')
 
-if (corpus_source_type in ['document']):
+if (corpus_source_type in ['file']):
     file_upload = st.file_uploader(
-        "Upload a document", type=['pdf'], accept_multiple_files=False)
+        "Upload a file", type=['pdf'], accept_multiple_files=False)
 
     if None not in [file_upload]:
         pdf_file_path = get_pdf_from_file_upload(file_upload)
@@ -168,7 +168,7 @@ def get_pdf_splitted_page_file(input_file_path, output_file_path):
 
 
 if (None not in [pdf_file_path]):
-    if (corpus_source_type in ['document', 'web']):
+    if (corpus_source_type in ['file', 'web']):
         file_name = os.path.splitext(os.path.basename(pdf_file_path))[0]
         pdf_reader = PdfReader(pdf_file_path)
         pdf_max_page = len(pdf_reader.pages)
@@ -215,7 +215,7 @@ def get_shaped_corpus(corpus, corpus_source_type, granularity):
         elif granularity == "paragraph":
             segmentation = Segmentation(paragraphs=True)
             granularized_corpus = segmentation(raw_corpus)
-    elif (corpus_source_type in ["document", "web"]):
+    elif (corpus_source_type in ["file", "web"]):
         if granularity == "word":
             granularized_corpus += raw_corpus.split(" ")
         elif granularity == "sentence":
@@ -405,7 +405,7 @@ def get_annotated_pdf(search_result_raw, granularized_corpus_raw, input_path, ou
 
 html_pdf = None
 if (None not in [corpus, filtered_search_result, shaped_corpus, corpus_source_type, output_type]):
-    if (corpus_source_type in ["document", "web"] and output_type in ["default"]):
+    if (corpus_source_type in ["file", "web"] and output_type in ["default"]):
         file_name = os.path.splitext(os.path.basename(corpus))[0]
         query_hash = hashlib.md5(query.encode('utf-8')).hexdigest()
         model_name_hash = hashlib.md5(json.dumps(
@@ -448,7 +448,7 @@ if (None not in [corpus, filtered_search_result, shaped_corpus, corpus_source_ty
 
     st.subheader("Output content")
     if (output_type in ["default"]):
-        if (corpus_source_type in ["document", "web"]):
+        if (corpus_source_type in ["file", "web"]):
             st.markdown(html_pdf, unsafe_allow_html=True)
         else:
             st.write(
