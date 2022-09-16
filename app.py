@@ -29,6 +29,9 @@ import pathlib
 import tokenizers
 import sqlite3
 
+import gc
+import signal
+
 from annotater import Annotate
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
@@ -47,8 +50,11 @@ if (is_git_sync_button_clicked):
     os.chdir("./")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
+    st.runtime.legacy_caching.clear_cache()
     st.experimental_singleton.clear()
     st.experimental_memo.clear()
+    gc.collect()
+    
 
 
 t0 = time.time()
