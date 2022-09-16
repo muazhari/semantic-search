@@ -47,7 +47,8 @@ if (is_git_sync_button_clicked):
     os.chdir("./")
     os.system('git fetch --all')
     os.system('git reset --hard origin')
-    st.caching.clear_cache()
+    st.experimental_singleton.clear()
+    st.experimental_memo.clear()
 
 
 t0 = time.time()
@@ -90,11 +91,11 @@ def hash_tokenizer(x):
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: hash_tokenizer, tokenizers.AddedToken: hash_tokenizer, sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
-def get_embeddings(model_name, method, data):
-    embeddings = Embeddings(
+def get_bi_encoder(model_name, method, data):
+    bi_encoder = Embeddings(
         {"path": model_name, "content": True, "method": method})
-    embeddings.index([(id, text, None) for id, text in data])
-    return embeddings
+    bi_encoder.index([(id, text, None) for id, text in data])
+    return bi_encoder
 
 
 corpus_source_type = st.radio(
@@ -271,18 +272,19 @@ if (None not in [shaped_corpus, granularity, window_sizes]):
 # result = (id: string, score: numeric)
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: hash_tokenizer, tokenizers.AddedToken: hash_tokenizer, sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def retrieval_search(queries, corpus, model_name, limit=None):
-    embeddings = get_embeddings(
-        model_name, "transformers", enumerate(corpus))
-    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
+    reformed_corpus_to_search = enumerate(corpus)
+    bi_encoder = get_bi_encoder(model_name, "transformers", reformed_corpus_to_search)
+    results = bi_encoder.search(queries, limit)
+    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in results]
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: hash_tokenizer, tokenizers.AddedToken: hash_tokenizer, sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
 def rerank_search(queries, retrieved_corpus, corpus, model_name, limit=None):
-    reformed_retrieved_corpus = [(result["corpus_id"], corpus[result["corpus_id"]])
-                                 for result in retrieved_corpus]
-    embeddings = get_embeddings(
-        model_name, "transformers", reformed_retrieved_corpus)
-    return [{"corpus_id": int(result["id"]), "score": result["score"]} for result in embeddings.search(queries, limit)]
+    reformed_retrieved_corpus = [(result["corpus_id"], corpus[result["corpus_id"]]) for result in retrieved_corpus]
+    reformed_retrieved_corpus_to_search = [text for id, text in reformed_retrieved_corpus]
+    cross_encoder = Similarity(model_name)
+    results = cross_encoder(query, reformed_retrieved_corpus_to_search)
+    return [{"corpus_id": int(reformed_retrieved_corpus[index][0]), "score": score} for index, score in results]
 
 
 @st.cache(hash_funcs={torch.Tensor: hash_tensor, torch.nn.parameter.Parameter: hash_parameter, tokenizers.Tokenizer: hash_tokenizer, tokenizers.AddedToken: hash_tokenizer, sqlite3.Connection: lambda x: hash(x), sqlite3.Cursor: lambda x: hash(x), sqlite3.Row: lambda x: hash(x)})
@@ -307,7 +309,7 @@ def semantic_search(model_name, query, window_sizes, windowed_granularized_corpu
             reranked_corpus = rerank_search(
                 query, retrieved_corpus, corpus, model_name["reranker"])
 
-        semantic_search_result[window_size] = reranked_corpus + retrieved_corpus
+        semantic_search_result[window_size] = retrieved_corpus + reranked_corpus 
 
         # averaging overlapping result
         for ssr in semantic_search_result[window_size]:
