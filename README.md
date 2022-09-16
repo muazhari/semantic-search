@@ -7,7 +7,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 ## Features
 
 - Asymetric/Symetric Semantic Search based on the given model.
-- Plug-and-Play Retriever Model & Reranker Model (Not yet supported).
+- Plug-and-Play Retriever Model & Reranker Model (Not yet validated).
 - Text, Web, and Pdf Input to Text and Pdf Output format.
 - Output Highlighter.
 - Processing time & Score statistics.
