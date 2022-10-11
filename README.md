@@ -50,7 +50,7 @@ NGROK_TOKEN = "" #@param {type:"string"}
 
 !nvidia-smi
 
-get_ipython().system_raw('ngrok authtoken {NGROK_TOKEN}'.format(NGROK_TOKEN=NGROK_TOKEN))
+get_ipython().system_raw(f'ngrok authtoken {NGROK_TOKEN}')
 get_ipython().system_raw('ngrok http 8501 &')
 print("Open public URL:")
 !curl -s http://localhost:4040/api/tunnels | jq ".tunnels[0].public_url"
