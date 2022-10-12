@@ -46,7 +46,7 @@ NGROK_TOKEN = "" #@param {type:"string"}
 !yes | DEBIAN_FRONTEND=noninteractive apt-get install -yqq wkhtmltopdf xvfb libopenblas-dev libomp-dev poppler-utils openjdk-8-jdk jq
 
 !pip install -r requirements.txt
-!pip install txtai[pipeline,similarity] pyngrok
+!pip install pyngrok
 
 !nvidia-smi
 
