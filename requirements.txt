@@ -8,7 +8,7 @@ pyvirtualdisplay
 sentence_transformers
 spacy
 streamlit
-txtai
+txtai[pipeline,similarity]
 txtmarker
 faiss-gpu
 
