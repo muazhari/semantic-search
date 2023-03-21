@@ -6,7 +6,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 
 ## Features
 
-- Asymmetric or Symmetric Supported Semantic Search with Averaging n-gram Scores using Sliding Window Algorithm.
+- Asymmetric or Symmetric Supported Semantic Search with Average Attention from n-gram Scores using Sliding Window Algorithm.
 - Plug-and-Play Retriever Model & Reranker Model.
 - Text, Web, and Pdf Input to Text and Pdf Output format.
 - Output Highlighter.
