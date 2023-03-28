@@ -30,7 +30,7 @@ Modification of CX_DB8 project by refactoring the code, adding user interface, a
 ## Walkthrough 
 
 1. Get your ngrok Authentication Token.
-2. Create cell based on below Jupyter Notebook script in Google Colab, Kaggle, or other alternatives.
+2. Create cell based on below Jupyter Notebook script in Kaggle or other alternatives.
 
 ```python
 #@title Semantic Search App
